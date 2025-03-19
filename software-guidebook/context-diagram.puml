@@ -3,7 +3,7 @@
 title Systeem Context Diagram voor TripTop Applicatie
 SHOW_PERSON_OUTLINE()
 Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/ past aan en betaalt")
-Person(ondersteuner, "Ondersteuner", "Tweede­lijns support; helpt de reiziger bij vragen.")
+Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij vragen.")
 
 System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
 
