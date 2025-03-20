@@ -1,0 +1,23 @@
+@startuml ReisBoeken
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+title Dynamisch Container Diagram – Reis boeken
+
+Person(user, "Gebruiker (Reiziger)", "Wil een geplande reis boeken en betalen")
+Container(frontend, "Frontend", "React", "UI waar de gebruiker reisopties selecteert en boekt")
+Container(backend, "Backend", "Java, Spring Boot", "Verwerkt boekingsverzoeken en beheert business logica")
+Container(db, "Database", "SQL", "Slaat trips, reserveringen en betalingen op")
+System_Ext(overnachting, "Booking API (Overnachtingen)", "Externe service voor overnachtingsmogelijkheden")
+System_Ext(autohuur, "Booking API (Autohuur)", "Externe service voor autohuur")
+System_Ext(payment, "Stripe API", "Externe service voor betalingen")
+
+Rel(user, frontend, "Selecteert reis en start boeking", "HTTPS")
+Rel(frontend, backend, "Stuurt boekingsverzoek (JSON)", "HTTPS/JSON")
+Rel(backend, db, "Slaat Trip en Reservering op", "JDBC/SQL")
+Rel(backend, overnachting, "Boekt overnachting", "HTTPS/JSON")
+Rel(backend, autohuur, "Boekt autohuur", "HTTPS/JSON")
+Rel(backend, payment, "Verwerkt betaling", "HTTPS/JSON")
+Rel(backend, frontend, "Stuurt bevestiging en reserveringsnummer", "HTTPS/JSON")
+Rel(frontend, user, "Toont boekingsbevestiging", "HTTPS")
+
+@enduml
+
