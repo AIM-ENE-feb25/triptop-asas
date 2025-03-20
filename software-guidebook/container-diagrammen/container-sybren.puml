@@ -1,0 +1,36 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+title Systeem Container Diagram voor TripTop Applicatie
+SHOW_PERSON_OUTLINE()
+Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/ past aan en betaalt")
+Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij vragen.")
+
+System_Boundary(c0, "Triptop systeem") {
+Container(frontend, Frontend, "Javascript/React", "Webapp voor het plannen, boeken, annuleren en beheren van reizen")
+Container(backend, Backend, "Spring Boot", "Webapp voor het plannen, boeken, annuleren en beheren van reizen")
+ContainerDb(db, Database, "?", "Slaat gebruikersgegevens, boekingen, reizen en bouwstenen op")
+}
+System_Ext(overnachtingen, "Overnachtingen (Booking, Airbnb)", "Biedt overnachtings­mogelijkheden")
+System_Ext(autohuur, "Autohuur (Sixt, Hertz)", "Biedt huurauto’s voor reizigers")
+System_Ext(activiteiten, "Activiteiten (GetYourGuide, Tripadvisor)", "Biedt excursies/activiteiten")
+System_Ext(vervoer1, "Vervoer (NS, Deutsche Bahn, KLM)", "Vervoer tussen overnachtingen (trein, vliegtuig)")
+System_Ext(vervoer2, "Routeplanner ( Google Maps API)", "Geeft routes voor de punten waar de reiziger langs wilt.")
+System_Ext(eten, "Eten & Drinken (Takeaway, Eet.nu)", "Maaltijd- en restaurant­opties")
+
+System_Ext(identity, "Identity Provider (Google, Microsoft, Airbnb, WireMock)", "Biedt centrale login zonder extra account aan te maken")
+System_Ext(payment, "BetalingsProvider (Stripe API)", "Verwerkt betalingen voor TripTop")
+
+Rel(reiziger, frontend, "Gebruikt TripTop voor het plannen, boeken, aanpassen en annuleren van de reis")
+Rel(ondersteuner, frontend, "Ondersteunt de reiziger via TripTop (advies)")
+Rel(frontend, backend, "Communiceert met backend voor data en acties")
+Rel_L(backend, db, "Leest en schrijft gegevens", "JDBC")
+Rel(backend, overnachtingen, "Haalt overnachtings­mogelijkheden op en boekt indien nodig", "HTTPS")
+Rel(backend, autohuur, "Haalt autohuur­mogelijkheden op en boekt deze", "HTTPS")
+Rel(backend, activiteiten, "Haalt activiteiten/excursies op en boekt deze", "HTTPS")
+Rel(backend, vervoer1, "Haalt reisopties (trein/vliegtuig) op en boekt deze", "HTTPS")
+Rel(backend, vervoer2, "Haalt alternatieve vervoersopties op (bijv. taxi of routeplan)", "HTTPS")
+Rel(backend, eten, "Haalt eet- en drink­mogelijkheden op (restaurants/bezorging)", "HTTPS")
+Rel(backend, identity, "Gebruikt SSO om reizigers te authenticeren", "HTTPS")
+Rel(backend, payment, "Maakt gebruik van externe betalings­systemen voor afrekenen", "HTTPS")
+
+@enduml
