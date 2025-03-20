@@ -7,15 +7,15 @@ Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij
 
 System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
 
-System_Ext(overnachtingen, "Overnachtingen (Booking, Airbnb)", "Biedt overnachtings­mogelijkheden")
-System_Ext(autohuur, "Autohuur (Sixt, Hertz)", "Biedt huurauto’s voor reizigers")
-System_Ext(activiteiten, "Activiteiten (GetYourGuide, Tripadvisor)", "Biedt excursies/activiteiten")
-System_Ext(vervoer1, "Vervoer (NS, Deutsche Bahn, KLM)", "Vervoer tussen overnachtingen (trein, vliegtuig)")
-System_Ext(vervoer2, "Routeplanner ( Google Maps API)", "Geeft routes voor de punten waar de reiziger langs wilt.")
-System_Ext(eten, "Eten & Drinken (Takeaway, Eet.nu)", "Maaltijd- en restaurant­opties")
+System_Ext(overnachtingen, "Booking API(Overnachtingen)", "Biedt overnachtings­mogelijkheden")
+System_Ext(autohuur, "Booking API (Autohuur)", "Biedt huurauto’s voor reizigers")
+System_Ext(activiteiten, "Tripadvisor API", "Biedt excursies/activiteiten")
+System_Ext(vervoer1, "Deutsche bahn API", "Vervoer tussen overnachtingen (trein, vliegtuig)")
+System_Ext(vervoer2, "Maps API", "Geeft routes voor de punten waar de reiziger langs wilt.")
+System_Ext(eten, "UberEats API", "Maaltijd- en restaurant­opties")
 
-System_Ext(identity, "Identity Provider (Google, Microsoft, Airbnb, WireMock)", "Biedt centrale login zonder extra account aan te maken")
-System_Ext(payment, "BetalingsProvider (Stripe API)", "Verwerkt betalingen voor TripTop")
+System_Ext(identity, "WireMock API", "Biedt centrale login zonder extra account aan te maken")
+System_Ext(payment, "Stripe API", "Verwerkt betalingen voor TripTop")
 
 Rel(reiziger, triptop, "Gebruikt TripTop voor het plannen, boeken, aanpassen en annuleren van de reis")
 Rel(ondersteuner, triptop, "Ondersteunt de reiziger via TripTop (advies)")
