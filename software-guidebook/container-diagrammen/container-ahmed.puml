@@ -1,14 +1,15 @@
-    @startuml
+@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-title Container Diagram voor TripTop Applicatie
+title Dynamisch Container Diagram voor TripTop – Flexibele Integratie van Externe APIs
 
 Person(reiziger, "Reiziger", "Gebruiker die zelfstandig reizen samenstelt, boekt, annuleert en betaalt")
 Person(ondersteuner, "Reis Agent", "Biedt tweedelijns support en advies")
 
 System_Boundary(triptop, "TripTop") {
-    Container(webApp, "Web Applicatie", "React/Angular", "Gebruikersinterface voor het plannen, boeken, aanpassen en annuleren van reizen")
-    Container(api, "Backend", "Java/Spring Boot", "Behandelt business logica, integratie met externe systemen en gebruikersauthenticatie")
-    Container(db, "Database", "PostgreSQL", "Slaat gebruikersgegevens, boekingen, reizen en bouwstenen op")
+    Container(webApp, "Web Applicatie", "Javascript/React", "Website voor het plannen, boeken, aanpassen en annuleren van reizen")
+    Container(api, "Backend", "Java/Spring Boot", "Behandelt business logica en integreert externe systemen via de API Gateway")
+    ContainerDb(db, "Database", "?", "Opslag van gebruikersgegevens, boekingen, reizen en bouwstenen")
+    Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Dynamische routering, transformatie en adaptering van externe API-aanroepen")
 }
 
 System_Ext(overnachtingen, "Booking API (Overnachtingen)", "Biedt overnachtingsmogelijkheden")
@@ -16,23 +17,26 @@ System_Ext(autohuur, "Booking API (Autohuur)", "Biedt autohuur mogelijkheden")
 System_Ext(activiteiten, "Tripadvisor API", "Biedt excursies en activiteiten")
 System_Ext(vervoer1, "Deutsche Bahn API", "Biedt transportopties zoals trein en vliegtuig")
 System_Ext(vervoer2, "Maps API", "Biedt routeplanning en alternatieve vervoersopties")
-System_Ext(eten, "Eten & Drinken API", "Biedt maaltijd- en restaurantopties")
+System_Ext(eten, "UberEats API", "Biedt maaltijd- en restaurantopties")
 System_Ext(identity, "WireMock API", "Biedt centrale identity management en SSO")
 System_Ext(payment, "Stripe API", "Verwerkt betalingen")
 
 Rel(reiziger, webApp, "Gebruikt", "HTTPS")
 Rel(ondersteuner, webApp, "Ondersteunt en adviseert", "HTTPS")
 
-Rel(webApp, api, "Verstuurt verzoeken", "?")
-Rel(api, db, "Leest en schrijft gegevens", "?")
+Rel(webApp, api, "Verstuurt verzoeken", "")
+Rel(api, db, "Leest en schrijft gegevens", "")
+Rel(api, apiGateway, "Verstuurt externe API-aanroepen", "")
 
-Rel(api, overnachtingen, "Haalt overnachtingsmogelijkheden op", "?")
-Rel(api, autohuur, "Haalt autohuur data op", "?")
-Rel(api, activiteiten, "Haalt activiteiten op", "?")
-Rel(api, vervoer1, "Haalt transportopties op", "?")
-Rel(api, vervoer2, "Haalt route-informatie op", "?")
-Rel(api, eten, "Haalt eet- en drinkopties op", "?")
-Rel(api, identity, "Authenticeert gebruikers", "?")
-Rel(api, payment, "Verwerkt betalingen", "?")
+Rel(apiGateway, overnachtingen, "Haal overnachtingsmogelijkheden op", "HTTPS/JSON   ")
+Rel(apiGateway, autohuur, "Haal autohuur data op", "HTTPS/JSON")
+Rel(apiGateway, activiteiten, "Haal activiteiten op", "HTTPS/JSON")
+Rel(apiGateway, vervoer1, "Haal transportopties op", "HTTPS/JSON")
+Rel(apiGateway, vervoer2, "Haal route-informatie op", "HTTPS/JSON")
+Rel(apiGateway, eten, "Haal eet- en drinkopties op", "HTTPS/JSON")
+Rel(apiGateway, identity, "Verifieert gebruikers", "HTTPS/JSON")
+Rel(apiGateway, payment, "Verwerkt betalingen", "HTTPS/JSON")
+
+
 
 @enduml
