@@ -1,0 +1,42 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Container Diagram voor TripTop Applicatie
+
+Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/past aan en betaalt")
+Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij vragen.")
+
+System_Boundary(triptop_boundary, "TripTop Systeem") {
+    Container(website, "Web App", "React", "Frontend voor gebruikers")
+    Container(gateway, "API Gateway", "React", "Zorgt voor de communicatie tussen front- en backend")
+    Container(backend, "Backend API", "Spring Boot", "Verwerkt aanvragen en data-opslag")
+    Container(database, "Database", "?", "Zorgt voor de data-opslag")
+}
+
+System_Boundary(externe_services, "Externe Diensten") {
+    Container(overnachtingen, "Overnachtingen API", "Extern", "Booking.com, Airbnb")
+    Container(autohuur, "Autohuur API", "Extern", "Sixt, Hertz")
+    Container(activiteiten, "Activiteiten API", "Extern", "GetYourGuide, Tripadvisor")
+    Container(vervoer, "Vervoer API", "Extern", "NS, Deutsche Bahn, KLM")
+    Container(routeplanner, "Routeplanner API", "Extern", "Google Maps API")
+    Container(eten, "Eten & Drinken API", "Extern", "Takeaway, Eet.nu")
+    Container(identity, "Identity Provider", "Extern", "Google, Microsoft, Airbnb")
+    Container(betaling, "BetalingsProvider", "Extern", "Stripe API")
+}
+
+Rel(reiziger, website, "Gebruikt webapp voor plannen en boeken")
+Rel(ondersteuner, website, "Ondersteunt reiziger bij het plannen en boeken")
+
+'Rel(website, backend, "Stuurt aanvragen naar API [JSON/HTTPS]")
+Rel_U(backend, overnachtingen, "Boekt overnachtingen via externe service")
+Rel(backend, autohuur, "Boekt huurauto’s via externe service")
+Rel(backend, activiteiten, "Boekt activiteiten via externe service")
+Rel(backend, vervoer, "Haalt vervoersopties op en boekt reizen")
+Rel(backend, routeplanner, "Haalt routes op voor reisplanning")
+Rel(backend, eten, "Haalt eet- en drinkmogelijkheden op")
+Rel(backend, identity, "Verifieert gebruikers via SSO")
+Rel(backend, betaling, "Verwerkt betalingen via externe provider")
+Rel(website, gateway, "Communiceert met backend via API Gateway [JSON/HTTPS]")
+Rel(gateway, backend, "Stuurt aanvragen naar backend [JSON/HTTPS]")
+Rel_L(backend, database, "Slaat data op in database")
+
+@enduml
