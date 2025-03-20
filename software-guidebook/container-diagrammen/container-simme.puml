@@ -19,11 +19,11 @@ System_Ext(vervoer_services, "Deutsche Bahn API", "Levert real-time informatie o
 System_Ext(routeplanner_service, "Maps API", "Biedt geavanceerde routeplanningsfunctionaliteit en alternatieve reisopties")
 System_Ext(autohuur_services, "Booking API (Autohuur)", "Geeft toegang tot een uitgebreid netwerk van autoverhuurlocaties en -diensten")
 System_Ext(activiteiten_services, "Tripadvisor API", "Verstrekt gedetailleerde informatie over lokale attracties, excursies en bezienswaardigheden")
-System_Ext(eten_services, "Eten & Drinken API", "Biedt een overzicht van restaurants, cafés en andere ervaringen op de bestemming")
+System_Ext(eten_services, "UberEats API", "Biedt een overzicht van restaurants, cafés en andere ervaringen op de bestemming")
 
 ' Relaties gebruiker naar containers
-Rel(reiziger, frontend, "Gebruikt via webbrowser (HTTPS)")
-Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface (HTTPS)")
+Rel(reiziger, frontend, "Gebruikt via webbrowser")
+Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
 
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, backend, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
