@@ -21,10 +21,10 @@ System_Ext(eten, "UberEats API", "Biedt maaltijd- en restaurantopties")
 System_Ext(identity, "WireMock API", "Biedt centrale identity management en SSO")
 System_Ext(payment, "Stripe API", "Verwerkt betalingen")
 
-Rel(reiziger, webApp, "Gebruikt", "HTTPS")
+Rel(reiziger, webApp, "Gebruikt ", "HTTPS")
 Rel(ondersteuner, webApp, "Ondersteunt en adviseert", "HTTPS")
 
-Rel(webApp, api, "Verstuurt verzoeken", "")
+Rel(webApp, api, "Verstuurt verzoeken", "HTTPS/JSON")
 Rel(api, db, "Leest en schrijft gegevens", "")
 Rel(api, apiGateway, "Verstuurt externe API-aanroepen", "")
 
