@@ -22,13 +22,13 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 * **Reis Agent**: Biedt tweedelijns ondersteuning aan reizigers met vragen of problemen.
 
 #### Externe Systemen:
-* **Overnachtingen** (Booking, Airbnb): Leveren accommodatiemogelijkheden.
-* **Autohuur** (Sixt, Hertz): Bieden huurauto-opties voor reizigers.
-* **Activiteiten** (GetYourGuide, Tripadvisor): Leveren excursies en activiteiten op locatie.
-* **Vervoer** (NS, Deutsche Bahn, KLM): Zorgen voor vervoersopties tussen overnachtingslocaties.
+* **Overnachtingen** (Booking): Leveren accommodatiemogelijkheden.
+* **Autohuur** (Booking): Bieden huurauto-opties voor reizigers.
+* **Activiteiten** (Tripadvisor): Leveren excursies en activiteiten op locatie.
+* **Vervoer** (Deutsche Bahn): Zorgen voor vervoersopties tussen overnachtingslocaties.
 * **Routeplanner** (Google Maps API): Genereert routes voor de gewenste reispunten.
-* **Eten & Drinken** (Takeaway, Eet.nu): Bieden maaltijd- en restaurantopties.
-* **Identity Provider** (Google, Microsoft, Airbnb, WireMock): Zorgt voor centrale aanmelding zonder extra account.
+* **Eten & Drinken** (UberEats API): Bieden maaltijd- en restaurantopties.
+* **Identity Provider** (WireMock): Zorgt voor centrale aanmelding zonder extra account.
 * **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
 
 ### 2.2 Container Diagram
