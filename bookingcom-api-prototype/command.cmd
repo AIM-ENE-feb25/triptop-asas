@@ -72,7 +72,7 @@ image_url:"https://cf.bstatic.com/static/img/plane-100.jpg"
 and more
 
 
-//Voor startDatum:Datum eindDatum:Datum 
+//Voor startDatum:Datum eindDatum:Datum
 
 Input dest_id=-2601889 arrival_date=18-11-2025 departure_date=27-11-2025
 curl --request GET
@@ -91,5 +91,5 @@ hotels:
    accessibilityLabel:"The Dilly. 5 out of 5 stars. 8.3 Very Good 11016 reviews. ‎Westminster Borough‬ • ‎650 m from downtown‬. Hotel room : 2 beds. 23409 AED. Includes taxes and fees."
 
 
-
+Prijs is min en max, in plaats van vaste prijs in reis
 
