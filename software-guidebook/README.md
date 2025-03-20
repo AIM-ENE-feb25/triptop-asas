@@ -9,13 +9,40 @@ Dit software guidebook geeft een overzicht van de Triptop-applicatie. Het bevat 
 
 ## 2. Context
 
-> [!IMPORTANT]
-> Werk zelf dit hoofdstuk uit met context diagrammen en een beschrijving van de context van de software.
+Triptop is een online platform dat reizigers in staat stelt om reizen zelfstandig te plannen, boeken, annuleren en beheren zonder tussenkomst van een reisbureau. Het platform integreert met diverse externe diensten voor accommodaties, vervoer, activiteiten en betalingen.
 
-Toelichting op de context van de software inclusief System Context Diagram:
-* Functionaliteit
-* Gebruikers
-* Externe systemen
+### 2.1 System Context Diagram
+
+Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers en externe systemen waarmee het interacteert:
+
+![System Context Diagram](context-diagram.png)
+
+#### Gebruikers:
+* **Reiziger**: Plant, boekt, annuleert en beheert reizen zelfstandig op basis van persoonlijke voorkeuren.
+* **Reis Agent**: Biedt tweedelijns ondersteuning aan reizigers met vragen of problemen.
+
+#### Externe Systemen:
+* **Overnachtingen** (Booking, Airbnb): Leveren accommodatiemogelijkheden.
+* **Autohuur** (Sixt, Hertz): Bieden huurauto-opties voor reizigers.
+* **Activiteiten** (GetYourGuide, Tripadvisor): Leveren excursies en activiteiten op locatie.
+* **Vervoer** (NS, Deutsche Bahn, KLM): Zorgen voor vervoersopties tussen overnachtingslocaties.
+* **Routeplanner** (Google Maps API): Genereert routes voor de gewenste reispunten.
+* **Eten & Drinken** (Takeaway, Eet.nu): Bieden maaltijd- en restaurantopties.
+* **Identity Provider** (Google, Microsoft, Airbnb, WireMock): Zorgt voor centrale aanmelding zonder extra account.
+* **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
+
+### 2.2 Container Diagram
+
+Het volgende diagram toont de hoofdcomponenten van het Triptop-systeem en hun interacties:
+
+![Container Diagram](container-diagram.png)
+
+#### Hoofdcomponenten:
+* **Frontend**: React/JavaScript applicatie die gebruikers in staat stelt om reizen te plannen, boeken en beheren.
+* **Backend**: Java/Spring Boot applicatie die boekingen verwerkt, bouwstenen beheert en externe diensten integreert.
+* **Database**: Slaat reis- en gebruikersgegevens op.
+
+De container diagram toont in meer detail hoe Triptop integreert met de verschillende externe diensten via API's en hoe de interne componenten met elkaar communiceren.
 
 ## 3. Functional Overview
 
