@@ -7,7 +7,7 @@ Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij
 
 System_Boundary(c0, "Triptop systeem") {
 Container(frontend, Frontend, "Javascript/React", "Webapp voor het plannen, boeken, annuleren en beheren van reizen")
-Container(backend, Backend, "Spring Boot", "Webapp voor het plannen, boeken, annuleren en beheren van reizen")
+Container(backend, Backend, "Java/Spring Boot", "Backend om API calls te verwerken en business logica af te handelen")
 ContainerDb(db, Database, "?", "Slaat gebruikersgegevens, boekingen, reizen en bouwstenen op")
 }
 System_Ext(overnachtingen, "Overnachtingen (Booking, Airbnb)", "Biedt overnachtings­mogelijkheden")
