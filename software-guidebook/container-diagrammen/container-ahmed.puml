@@ -1,6 +1,6 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-title Dynamisch Container Diagram voor TripTop – Flexibele Integratie van Externe APIs
+title Dynamisch Container Diagram voor TripTop
 
 Person(reiziger, "Reiziger", "Gebruiker die zelfstandig reizen samenstelt, boekt, annuleert en betaalt")
 Person(ondersteuner, "Reis Agent", "Biedt tweedelijns support en advies")
@@ -8,8 +8,8 @@ Person(ondersteuner, "Reis Agent", "Biedt tweedelijns support en advies")
 System_Boundary(triptop, "TripTop") {
     Container(webApp, "Web Applicatie", "Javascript/React", "Website voor het plannen, boeken, aanpassen en annuleren van reizen")
     Container(api, "Backend", "Java/Spring Boot", "Behandelt business logica en integreert externe systemen via de API Gateway")
-    ContainerDb(db, "Database", "?", "Opslag van gebruikersgegevens, boekingen, reizen en bouwstenen")
-    Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Dynamische routering, transformatie en adaptering van externe API-aanroepen")
+    ContainerDb(db, "Database", "?", "Opslag van boekingen, reizen en bouwstenen")
+    Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Brug tussen de backend en de externe systemen.")
 }
 
 System_Ext(overnachtingen, "Booking API (Overnachtingen)", "Biedt overnachtingsmogelijkheden")
