@@ -31,18 +31,7 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 * **Identity Provider** (WireMock): Zorgt voor centrale aanmelding zonder extra account.
 * **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
 
-### 2.2 Container Diagram
 
-Het volgende diagram toont de hoofdcomponenten van het Triptop-systeem en hun interacties:
-
-![Container Diagram](container-diagram.png)
-
-#### Hoofdcomponenten:
-* **Frontend**: React/JavaScript applicatie die gebruikers in staat stelt om reizen te plannen, boeken en beheren.
-* **Backend**: Java/Spring Boot applicatie die boekingen verwerkt, bouwstenen beheert en externe diensten integreert.
-* **Database**: Slaat reis- en gebruikersgegevens op.
-
-De container diagram toont in meer detail hoe Triptop integreert met de verschillende externe diensten via API's en hoe de interne componenten met elkaar communiceren.
 
 ## 3. Functional Overview
 
@@ -105,9 +94,68 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 ## 7. Software Architecture
 
 ###     7.1. Containers
+Het volgende diagram toont de hoofdcomponenten van het Triptop-systeem en hun interacties:
 
-> [!IMPORTANT]
-> Voeg toe: Container Diagram plus een Dynamic Diagram van een aantal scenario's inclusief begeleidende tekst.
+![Container Diagram](container-diagram.png)
+
+#### Hoofdcomponenten:
+* **Frontend**: React/JavaScript applicatie die gebruikers in staat stelt om reizen te plannen, boeken en beheren.
+* **Backend**: Java/Spring Boot applicatie die boekingen verwerkt, bouwstenen beheert en externe diensten integreert.
+* **Database**: Slaat reis- en gebruikersgegevens op.
+
+De container diagram toont in meer detail hoe Triptop integreert met de verschillende externe diensten via API's en hoe de interne componenten met elkaar communiceren.
+### 2.2 Dynamische Container Diagram
+### 7.2.1  Inloggen
+
+![Inloggen](dynamisch-container-diagrammen/inlog-dynamisch-diagram.png)
+
+Toelichting
+
+    Gebruiker voert inloggegevens in:
+    De gebruiker typt zijn gebruikersnaam en wachtwoord in de Frontend (de gebruikersinterface gebouwd met React). Deze stap vindt plaats via een beveiligde HTTPS-verbinding.
+
+    Verzenden van het inlogverzoek:
+    De Frontend stuurt het inlogverzoek (in JSON-formaat) naar de Backend, die is gebouwd met Java en Spring Boot.
+
+    Authenticatie door de externe identiteitprovider:
+    De Backend stuurt het verzoek door naar de WireMock API, die in dit geval een externe service is die de centrale identiteitsverificatie en SSO (Single Sign-On) simuleert. Deze service controleert de inloggegevens en retourneert een token en gebruikersinformatie.
+
+    Ophalen en verwerken van gebruikersdata:
+    Na ontvangst van het token vraagt de Backend via JDBC/SQL de bijbehorende gebruikersgegevens op uit de Database.
+
+    Terugkoppeling naar de Frontend:
+    De Backend stuurt het token en de profielinformatie terug naar de Frontend, die deze informatie vervolgens toont aan de gebruiker, zodat deze als ingelogd wordt herkend.
+
+### 7.2.2 Reis Boeken
+![Reis Boeken](dynamisch-container-diagrammen/reis-boeken-dynamisch-diagram.png)
+
+Toelichting
+
+    Selectie van reis:
+    De gebruiker kiest via de Frontend (React) de vertrek- en bestemmingslocatie en geeft aan dat hij een reis met vervoer met een huurauto wil boeken. Deze selectie vindt plaats via een HTTPS-verbinding.
+
+    Verzenden van reisgegevens:
+    De Frontend stuurt de geselecteerde reisdetails (in JSON) naar de Backend (Java/Spring Boot). Dit omvat informatie zoals de locaties, de gewenste datum en tijd, en de keuze voor een huurauto als vervoersmiddel.
+
+    Route-informatie opvragen:
+    De Backend vraagt via de Maps API de routeinformatie op, zoals afstand en reistijd tussen de vertrek- en bestemmingslocatie. De Maps API retourneert deze gegevens weer via HTTPS/JSON.
+
+    Huurauto boeken:
+    Vervolgens roept de Backend de Booking API aan om de huurauto te reserveren. Hierbij worden onder andere de start- en einddatum en locatiegegevens meegegeven. De Booking API bevestigt de reservering.
+
+    Betaling verwerken:
+    Na de reservering verwerkt de Backend de betaling via de Stripe API. Stripe verwerkt de betaling en retourneert een betaalbevestiging.
+
+    Opslag van de transactie:
+    De Backend slaat alle reis-, reserverings- en betalingsgegevens op in de Database (via JDBC/SQL).
+
+    Terugkoppeling naar de gebruiker:
+    Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserveringsnummer en betaalstatus, terug naar de Frontend. De Frontend toont deze bevestiging aan de gebruiker.
+
+    Herstart van het proces:
+    Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
+
+
 
 ###     7.2. Components
 
@@ -124,35 +172,54 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 > [!IMPORTANT]
 > Voeg toe: 3 tot 5 ADR's die beslissingen beschrijven die zijn genomen tijdens het ontwerpen en bouwen van de software.
 
-### 8.1. ADR-001 TITLE
 
-> [!TIP]
-> These documents have names that are short noun phrases. For example, "ADR 1: Deployment on Ruby on Rails 3.0.10" or "ADR 9: LDAP for Multitenant Integration". The whole ADR should be one or two pages long. We will write each ADR as if it is a conversation with a future developer. This requires good writing style, with full sentences organized into paragraphs. Bullets are acceptable only for visual style, not as an excuse for writing sentence fragments. (Bullets kill people, even PowerPoint bullets.)
+### **ADR-001: Gebruik van Stripe als betalingsprovider**
 
-#### Context 
+**Status:**  
+Geaccepteerd
 
-> [!TIP]
-> This section describes the forces at play, including technological, political, social, and project local. These forces are probably in tension, and should be called out as such. The language in this section is value-neutral. It is simply describing facts about the problem we're facing and points out factors to take into account or to weigh when making the final decision.
+#### **Context**  
+Onze TripTop-applicatie moet een betalingssysteem hebben waarmee gebruikers hun reis gemakkelijk kunnen betalen. Andere externe systemen (zoals voor hotels of autohuur) hebben soms hun eigen betaalmethodes, maar dat kan leiden tot een rommelige en onduidelijke gebruikerservaring. Daarom willen we één enkel systeem gebruiken dat voor iedereen werkt.
 
-#### Considered Options
+#### **Decision Forces**
 
-> [!TIP]
-> This section describes the options that were considered, and gives some indication as to why the chosen option was selected.
+We hebben drie opties overwogen. Hier is een eenvoudige tabel met plussen en minnen om te laten zien wat goed (+) en minder goed (-) is aan elke optie:
 
-#### Decision
+| **Optie**                   | **Uniformiteit** | **Veiligheid & Regels** | **Schaalbaarheid** | **Technische Moeilijkheid** | **Afhankelijkheid** | **Kosten** |
+|-----------------------------|------------------|-------------------------|--------------------|-----------------------------|---------------------|------------|
+| **Stripe**                  | ++               | ++                      | ++                 | +                           | -                   | +          |
+| **Externe API-betalingen**  | -                | -                       | -                  | ++                          | ++                  | ++         |
+| **Eigen Betaalinfrastructuur** | -             | -                       | -                  | -                           | ++                  | -          |
 
-> [!TIP]
-> This section describes our response to the forces/problem. It is stated in full sentences, with active voice. "We will …"
+- **Uniformiteit:** Stripe geeft één manier van betalen voor alle boekingen (++), terwijl externe systemen verschillende methoden hebben (-).
+- **Veiligheid & Regels:** Stripe voldoet aan belangrijke regels (zoals PCI-DSS en GDPR) (++), wat bij andere opties vaak niet zo duidelijk is (-).
+- **Schaalbaarheid:** Stripe groeit mee als er meer gebruikers komen (++), externe systemen zijn vaak beperkt (-).
+- **Technische Moeilijkheid:** Het opzetten van Stripe is relatief makkelijk (+), terwijl eigen oplossingen vaak moeilijker zijn (-).
+- **Afhankelijkheid:** Als we externe betaalmethoden gebruiken, zijn we erg afhankelijk van meerdere partijen (++), terwijl Stripe minder afhankelijk maakt (-).
+- **Kosten:** Stripe rekent wel kosten per transactie (+), maar dit is acceptabel vergeleken met de nadelen van andere opties (++ of -).
 
-#### Status 
+#### **Beslissing**
 
-> [!TIP]
-> A decision may be "proposed" if the project stakeholders haven't agreed with it yet, or "accepted" once it is agreed. If a later ADR changes or reverses a decision, it may be marked as "deprecated" or "superseded" with a reference to its replacement.
+Wij kiezen voor **Stripe** als onze betalingsprovider.  
+- **Waarom?**  
+  - Stripe zorgt voor één uniforme betalingsmethode voor alle boekingen.  
+  - Het voldoet aan alle belangrijke veiligheidsregels en kan eenvoudig meeschalen.  
+  - Het maakt het technisch eenvoudiger en vermindert de afhankelijkheid van meerdere externe partijen.
+  
+#### **Consequenties**
 
-#### Consequences 
+- Alles wordt via Stripe verwerkt, wat de gebruikerservaring eenvoudiger en consistenter maakt.
+-  Stripe voldoet aan alle belangrijke veiligheidsnormen.
+-  Naarmate het aantal gebruikers groeit, kan Stripe meeschalen zonder extra moeite.
+- Stripe rekent kosten per transactie, wat de marges kan beïnvloeden.
+- Als Stripe problemen heeft, heeft dit invloed op onze betalingsverwerking.
+- Extra werk is nodig om Stripe goed te integreren en te beheren.
 
-> [!TIP]
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
+
+
+
+
+
 
 ### 8.2. ADR-002 TITLE
 
