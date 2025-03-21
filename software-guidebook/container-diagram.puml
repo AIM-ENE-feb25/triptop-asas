@@ -14,10 +14,9 @@ System_Boundary(triptop, "TripTop") {
 
 System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On voor testdoeleinden")
 System_Ext(payment_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
-System_Ext(overnachting_services, "Booking API (Overnachtingen)", "Geeft toegang tot een breed scala aan accommodaties en boekingsmogelijkheden")
-System_Ext(vervoer_services, "Deutsche Bahn API", "Levert real-time informatie over treinreizen en andere vervoersopties")
+System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accommodaties,boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
+System_Ext(vervoer_services, "NS API", "Levert real-time informatie over treinreizen ")
 System_Ext(routeplanner_service, "Maps API", "Biedt geavanceerde routeplanningsfunctionaliteit en alternatieve reisopties")
-System_Ext(autohuur_services, "Booking API (Autohuur)", "Geeft toegang tot een uitgebreid netwerk van autoverhuurlocaties en -diensten")
 System_Ext(activiteiten_services, "Tripadvisor API", "Verstrekt gedetailleerde informatie over lokale attracties, excursies en bezienswaardigheden")
 System_Ext(eten_services, "UberEats API", "Biedt een overzicht van restaurants, cafés en andere ervaringen op de bestemming")
 
@@ -30,13 +29,12 @@ Rel(frontend, backend, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)"
 Rel_L(backend, database, "Leest/schrijft gegevens naar database via JDBC")
 
 ' Relaties backend naar externe systemen
-Rel(backend, identity_provider, "Authenticeert gebruikers via OAuth/OpenID Connect (HTTPS)")
+Rel(backend, identity_provider, "Authenticeert gebruikers  (HTTPS)")
 Rel(backend, payment_provider, "Verwerkt betalingen via REST API (JSON/HTTPS)")
 
-Rel(backend, overnachting_services, "Haalt overnachtingsmogelijkheden op en boekt via REST API (JSON/HTTPS)")
+Rel(backend, booking, "Haalt overnachtingsmogelijkheden op en boekt via REST API (JSON/HTTPS)")
 Rel(backend, vervoer_services, "Haalt vervoersmogelijkheden op en boekt via REST API (JSON/HTTPS)")
 Rel(backend, routeplanner_service, "Haalt routes op via REST API (JSON/HTTPS)")
-Rel(backend, autohuur_services, "Haalt autohuurmogelijkheden op en boekt via REST API (JSON/HTTPS)")
 Rel(backend, activiteiten_services, "Haalt activiteiten/excursies op en boekt via REST API (JSON/HTTPS)")
 Rel(backend, eten_services, "Haalt eet- en drinkmogelijkheden op via REST API (JSON/HTTPS)")
 @enduml

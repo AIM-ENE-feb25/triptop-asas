@@ -1,23 +1,27 @@
-@startuml ReisBoeken
+@startuml ReisBoekenHuurauto
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
-title Dynamisch Container Diagram – Reis boeken
+title Dynamisch Container Diagram – Reis boeken met vervoer met een huurauto (Inclusief Stripe)
 
-Person(user, "Gebruiker (Reiziger)", "Wil een geplande reis boeken en betalen")
-Container(frontend, "Frontend", "React", "UI waar de gebruiker reisopties selecteert en boekt")
-Container(backend, "Backend", "Java, Spring Boot", "Verwerkt boekingsverzoeken en beheert business logica")
-Container(db, "Database", "SQL", "Slaat trips, reserveringen en betalingen op")
-System_Ext(overnachting, "Booking API (Overnachtingen)", "Externe service voor overnachtingsmogelijkheden")
-System_Ext(autohuur, "Booking API (Autohuur)", "Externe service voor autohuur")
-System_Ext(payment, "Stripe API", "Externe service voor betalingen")
+Person(user, "Reiziger", "Gebruiker die een reis plant met vervoer met een huurauto")
+System_Boundary(triptop, "TripTop") {
+    Container(frontend, "Frontend", "React", "UI waar de gebruiker de reis selecteert en boekt")
+    Container(backend, "Backend", "Java, Spring Boot", "Beheert reisobjecten, vraagt route op, boekt de huurauto en verwerkt betalingen")
+    ContainerDb(db, "Database", "SQL", "Slaat trips, reserveringen en betalingsgegevens op")
+    }
+System_Ext(mapsApi, "Maps API", "Berekent de route tussen vertrek- en bestemmingslocatie")
+System_Ext(autohuurApi, "Booking API", "Boekt de huurauto voor de reis")
+System_Ext(payment, "Stripe API", "Verwerkt betalingen voor de reis")
 
-Rel(user, frontend, "Selecteert reis en start boeking", "HTTPS")
-Rel(frontend, backend, "Stuurt boekingsverzoek (JSON)", "HTTPS/JSON")
-Rel(backend, db, "Slaat Trip en Reservering op", "JDBC/SQL")
-Rel(backend, overnachting, "Boekt overnachting", "HTTPS/JSON")
-Rel(backend, autohuur, "Boekt autohuur", "HTTPS/JSON")
+Rel(user, frontend, "Selecteert reis met vertrek- en bestemmingslocatie\n(en kiest vervoer met een huurauto)", "HTTPS")
+Rel(frontend, backend, "Stuurt reisdetails (Locatie A -> B, vervoer met een huurauto)", "HTTPS/JSON")
+Rel(backend, mapsApi, "Haalt route-info op (afstand, reistijd)", "HTTPS/JSON")
+Rel(mapsApi, backend, "Retourneert route-informatie", "HTTPS/JSON")
+Rel(backend, autohuurApi, "Boekt de huurauto (startDatum, eindDatum, locatie)", "HTTPS/JSON")
+Rel(autohuurApi, backend, "Bevestigt de reservering", "HTTPS/JSON")
 Rel(backend, payment, "Verwerkt betaling", "HTTPS/JSON")
-Rel(backend, frontend, "Stuurt bevestiging en reserveringsnummer", "HTTPS/JSON")
-Rel(frontend, user, "Toont boekingsbevestiging", "HTTPS")
+Rel(payment, backend, "Retourneert betaalbevestiging", "HTTPS/JSON")
+Rel(backend, db, "Slaat reis-, reserverings- en betalingsgegevens op", "JDBC/SQL")
+Rel(backend, frontend, "Stuurt definitieve bevestiging, reserveringsnummer en betaalstatus", "HTTPS/JSON")
+Rel(frontend, user, "Toont definitieve boekingsgegevens", "HTTPS")
 
 @enduml
-
