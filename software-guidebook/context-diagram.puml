@@ -4,9 +4,9 @@ title Systeem Context Diagram voor TripTop Applicatie
 SHOW_PERSON_OUTLINE()
 Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/ past aan en betaalt")
 Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij vragen.")
-
-System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
-
+System_Boundary("TripTop","TripTop"){
+    System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
+}
 System_Ext(booking, "Booking API", "Biedt overnachtings­mogelijkheden en huurauto’s voor reizigers")
 System_Ext(activiteiten, "Tripadvisor API", "Biedt excursies/activiteiten")
 System_Ext(vervoer1, "NS API", "Vervoer tussen overnachtingen (trein)")
