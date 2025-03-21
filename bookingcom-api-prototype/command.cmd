@@ -5,7 +5,7 @@ Input locatie amsterdam
 curl --request GET
 	--url 'https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=london'
 	--header 'x-rapidapi-host: booking-com15.p.rapidapi.com'
-	--header 'x-rapidapi-key: 3ab405fed0msh0d94904ed446f58p155f23jsn6fc0bfb7477e'
+	--header 'x-rapidapi-key: MY_API_KEY'
 
 Output
 
@@ -72,13 +72,13 @@ image_url:"https://cf.bstatic.com/static/img/plane-100.jpg"
 and more
 
 
-//Voor startDatum:Datum eindDatum:Datum
+//Voor startDatum:Datum eindDatum:Datum met dest_id
 
 Input dest_id=-2601889 arrival_date=18-11-2025 departure_date=27-11-2025
 curl --request GET
 	--url 'https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=929&search_type=CITY&arrival_date=2025-03-22&departure_date=2025-03-23&adults=1&children_age=0%2C17&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=AED'
 	--header 'x-rapidapi-host: booking-com15.p.rapidapi.com'
-	--header 'x-rapidapi-key: 3ab405fed0msh0d94904ed446f58p155f23jsn6fc0bfb7477e'
+	--header 'x-rapidapi-key: MY_API_KEY'
 
 Output
 
