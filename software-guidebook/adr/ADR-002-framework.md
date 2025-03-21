@@ -9,11 +9,11 @@ framework om dit te realiseren.
 
 #### Overwogen Opties
 
-| **Criteria**                     | **Spring Boot**         | **Quarkus**             | **Micronaut**           | **Jakarta EE**          | **Vert.x**              | **Dropwizard**          | **Helidon**             |
-|----------------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
-| **Makkelijk in gebruik**         | Zeer makkelijk          | Makkelijk               | Makkelijk               | Gemiddeld               | Moeilijk                | Makkelijk               | Gemiddeld               |
-| **Snelheid opstarttijd**         | Gemiddeld               | Zeer snel               | Snel                    | Langzaam                | Zeer snel               | Gemiddeld               | Snel                    |
-| **Geheugengebruik**              | Gemiddeld               | Laag                    | Laag                    | Hoog                    | Laag                    | Gemiddeld               | Laag                    |
+| **Criteria**                     | **Spring Boot** | **Quarkus** | **Micronaut** | **Jakarta EE** | **Vert.x** | **Dropwizard** | **Helidon** |
+|----------------------------------|-----------------|-------------|---------------|----------------|------------|----------------|-------------|
+| **Makkelijk in gebruik**         | ++              | +           | +             |                | -          | +              |             |
+| **Snelheid opstarttijd**         |        | ++          | +             | -              | ++         |       | +           |
+| **Geheugengebruik**              |        | -           | -             | +              | -          |       | _           |
 
 
 
@@ -28,7 +28,6 @@ Accepted
 Door gebruik te maken van Spring Boot, zullen wij minder snelheidsproblemen hebben en is het makkelijker om het prototype te realiseren. 
 Daarnaast zullen wij minder tijd kwijt zijn aan het leren van een nieuw framework, omdat wij al ervaring hebben met Spring Boot.
 
-```
 
 
 
