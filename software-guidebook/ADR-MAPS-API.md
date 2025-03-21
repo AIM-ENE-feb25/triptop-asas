@@ -6,6 +6,15 @@ Voor onze applicatie hebben we een API nodig die routebeschrijvingen kan generer
 ## Besluit
 We hebben besloten om de rapidAPI te gebruiken voor de routebeschrijving in onze app. Dit komt omdat deze geen kosten met zich mee brengt en omdat er geen creditcard vereist is om deze te gebruiken. Ook is dit een "fake" API, wat betekent dat deze geen echte routebeschrijvingen genereert, maar wel de functionaliteit biedt om te testen of de routebeschrijvingen in de app werken. Echter krijg je van deze API alleen een JSON bestand met een routebeschrijving, en geen visuele weergave van de route.
 
+| Criteria                   | RapidAPI | Google Maps API | Mapbox Directions API |
+|----------------------------|----------|-----------------|-----------------------|
+| **Nauwkeurigheid**         | --       | ++              | +                     |
+| **Kosten**                 | ++       | --              | -                     |
+| **Integratiegemak**        | ++       | ++              | ++                    |
+| **Beschikbaarheid**        | +        | ++              | ++                    |
+| **Visualisatie opties**    | --       | ++              | ++                    |
+| **Documentatie**           | +        | ++              | +                     |
+
 ## Alternatieven
 1. **Google Maps API** – Zeer nauwkeurig en breed ondersteund, maar relatief duur bij schaalvergroting.
 3. **Mapbox Directions API** – Goede visualisatie-opties en concurrerend geprijsd, maar minder dekking dan Google Maps.
