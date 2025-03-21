@@ -1,0 +1,23 @@
+@startuml Inloggen
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+title Dynamisch Container Diagram – Inloggen
+
+Person(user, "Gebruiker (Reiziger)", "Wilt inloggen op TripTop")
+
+System_Boundary(triptop, "TripTop") {
+Container(frontend, "Frontend", "React", "UI waar de gebruiker inlogt")
+Container(backend, "Backend", "Java, Spring Boot", "Behandelt inlogverzoeken en authenticatie")
+ContainerDb(db, "Database", "SQL", "Slaat gebruikers- en reisgegevens op")
+}
+System_Ext(identity, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On voor testdoeleinden")
+
+Rel(user, frontend, "Voert inloggegevens in", "HTTPS")
+Rel(frontend, backend, "Stuurt inlogverzoek (JSON)", "HTTPS/JSON")
+Rel(backend, identity, "Verifieert gebruiker", "HTTPS/JSON")
+Rel(identity, backend, "Retourneert token & gebruikersinfo", "HTTPS/JSON")
+Rel(backend, db, "Vraagt gebruikersdata op", "JDBC/SQL")
+Rel(db, backend, "Retourneert gegevens", "JDBC/SQL")
+Rel(backend, frontend, "Geeft token en profiel door", "HTTPS/JSON")
+Rel(frontend, user, "Toont ingelogde status", "HTTPS")
+
+@enduml
