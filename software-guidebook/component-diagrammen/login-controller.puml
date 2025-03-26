@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title Component Diagram – TripTop Backend (Zonder API Facade)
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+
+System_Boundary(backendSystem, "Backend", "Java, Spring Boot", "Beheert de businesslogica van TripTop") {
+    Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+
+    Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+
+    Component(userRepository, "User Repository", "Spring Data JPA", "Slaat gebruikersgegevens op")
+    Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
+
+    Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
+
+
+}
+
+System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en SSO")
+Rel(loginService, identity_provider, "Authenticeert gebruikers", "REST/JSON")
+
+Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+Rel(userRepository, database, "Stuurt inlogverzoeken", "HTTPS")
+
+Rel(frontend, loginController, "Stuurt inlogverzoeken", "HTTPS")
+
+@enduml

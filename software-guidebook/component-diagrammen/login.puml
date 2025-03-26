@@ -1,0 +1,30 @@
+@startuml
+title Class Diagram – Login
+
+interface LoginService {
+    +AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+}
+class LoginController {
+    +AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+}
+class LoginServiceImpl {
+    +AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+}
+interface LoginRepo {
+    +Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
+}
+class LoginRepoImpl {
+    +Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
+}
+class Reiziger {
+    -String username
+    -String password
+}
+
+LoginController ..> LoginService: "gebruikt"
+LoginServiceImpl ..|> LoginService: "implementeert"
+LoginServiceImpl ..> AuthenticationException : "gooit"
+LoginRepoImpl ..|> LoginRepo: "implementeert"
+LoginServiceImpl ..> LoginRepo : "gebruikt"
+
+@enduml
