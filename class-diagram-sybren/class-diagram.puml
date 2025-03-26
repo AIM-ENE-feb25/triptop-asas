@@ -1,0 +1,48 @@
+@startuml
+title Class Diagram – Boeking
+
+class Boeking {
+    -Int boekingId
+    -Int reizigerId
+    -Date boekingsDatum
+    -Date vertrekDatum
+    -Date aankomstDatum
+    -String vertrekLocatie
+    -String aankomstLocatie
+    -Double prijs
+}
+class BoekingController {
+
+}
+
+class BoekingService {
+
+}
+
+class BoekingRepository {}
+
+class FacadeService {
+
+}
+
+class BookingComAdapter {
+
+}
+
+class TripTopService {
+
+}
+
+interface BoekingInterface {}
+
+
+BoekingController ..> BoekingService: "gebruikt"
+BoekingService ..> FacadeService: "gebruikt"
+BoekingService ..> BoekingRepository: "gebruikt"
+FacadeService ..|> BoekingInterface : "implementeert"
+FacadeService  ..> BookingComAdapter : "gebruikt"
+FacadeService ..> TripTopService : "gebruikt"
+
+
+
+@enduml
