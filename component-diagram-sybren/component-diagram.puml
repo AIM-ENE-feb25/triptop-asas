@@ -1,0 +1,38 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Component diagram van TripTop voor het TripTop systeem
+
+Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
+Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
+
+System_Boundary(triptop, "TripTop") {
+    Container(controller, "BoekingController", "Spring MVC REST Controller")
+    Container(service, "BoekingService", "Bevat businesslogica", "Bevat businesslogica")
+    Container(facade, "FacadeService", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
+    Container(boeking_repository, "BoekingRepository", "Verantwoordelijk voor het ophalen van informatie uit booking.com, het cachen daarvan en het automatisch schakelen tussen de gecachde data en realtime data op basis van de beschikbaarheid")
+    Container(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
+    Container(triptop_service, "TripTopService", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
+}
+
+ Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+ Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+
+System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accommodaties,boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
+
+
+' Relaties gebruiker naar containers
+Rel(reiziger, frontend, "Gebruikt via webbrowser")
+Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
+
+' Relaties tussen containers binnen TripTop
+Rel(frontend, controller, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
+Rel(controller, service, "Leest/schrijft gegevens naar database via JDBC")
+Rel(service, facade, "Leest/schrijft gegevens naar database via JDBC")
+Rel(service, boeking_repository, "Leest/schrijft gegevens naar database via JDBC")
+Rel(boeking_repository, database, "Leest/schrijft gegevens naar database via JDBC")
+Rel(facade, booking_com_adapter, "Leest/schrijft gegevens naar database via JDBC")
+Rel(facade, triptop_service, "Leest/schrijft gegevens naar database via JDBC")
+' Relaties backend naar externe systemen
+Rel_U(booking_com_adapter, booking, "Haalt overnachtingsmogelijkheden op en boekt via REST API (JSON/HTTPS)")
+@enduml
