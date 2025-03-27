@@ -1,40 +1,71 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-title Component diagram van TripTop voor het TripTop systeem
+title Verbeterd Component Diagram van TripTop
 
-Persoon(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
-Persoon(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
+System_Boundary(triptop, "TripTop") {
+    Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
 
-Systeem_Grens(triptop, "TripTop") {
-    Component(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
-    Component(backend, "Backend", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
-    Component(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+    System_Boundary(triptop_backend, "TripTop Backend") {
+        Component(auth_service, "Authenticatie Service", "Spring Security", "Beheert gebruikersauthenticatie en sessies")
+        Component(payment_service, "Betalingsservice", "Spring Boot", "Verwerkt betalingen en transacties")
+        Component(booking_service, "Boekingsservice", "Spring Boot", "Behandelt boekingen en reserveringen")
+        Component(travel_service, "Reisplanner Service", "Spring Boot", "Biedt route- en vervoersopties aan gebruikers")
+        Component(activity_service, "Activiteitenservice", "Spring Boot", "Beheert excursies en activiteiten voor bestemmingen")
+
+        Component(auth_repository, "Authenticatie Repository", "JPA Repository", "Beheert gebruikersgegevens in de database")
+        Component(payment_repository, "Betalingsrepository", "JPA Repository", "Beheert betalingsgegevens in de database")
+        Component(booking_repository, "Boekingsrepository", "JPA Repository", "Beheert boekingsgegevens in de database")
+        Component(travel_repository, "Reisrepository", "JPA Repository", "Beheert reisgegevens in de database")
+        Component(activity_repository, "Activiteitenrepository", "JPA Repository", "Beheert activiteiten in de database")
+
+        Component(payment_adapter, "Stripe Adapter", "Spring", "Abstracteert interactie met Stripe API")
+        Component(booking_adapter, "Booking Adapter", "Spring", "Abstracteert interactie met Booking API")
+        Component(travel_adapter, "NS Adapter", "Spring", "Abstracteert interactie met NS API")
+        Component(routeplanner_adapter, "Maps Adapter", "Spring", "Abstracteert interactie met Maps API")
+        Component(activity_adapter, "Tripadvisor Adapter", "Spring", "Abstracteert interactie met Tripadvisor API")
+        Component(food_adapter, "UberEats Adapter", "Spring", "Abstracteert interactie met UberEats API")
+    }
 }
 
-Systeem_Extern(identiteits_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On voor testdoeleinden")
-Systeem_Extern(betalings_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
-Systeem_Extern(boeking, "Booking API", "Geeft toegang tot een breed scala aan accommodaties, boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
-Systeem_Extern(vervoersdiensten, "NS API", "Levert real-time informatie over treinreizen")
-Systeem_Extern(routeplanner_dienst, "Maps API", "Biedt geavanceerde routeplanningsfunctionaliteit en alternatieve reisopties")
-Systeem_Extern(activiteiten_diensten, "Tripadvisor API", "Verstrekt gedetailleerde informatie over lokale attracties, excursies en bezienswaardigheden")
-Systeem_Extern(eet_diensten, "UberEats API", "Biedt een overzicht van restaurants, cafés en andere ervaringen op de bestemming")
+System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On")
+System_Ext(payment_provider, "Stripe API", "Faciliteert online betalingen")
+System_Ext(booking, "Booking API", "Boekingsmogelijkheden voor accommodaties en huurauto's")
+System_Ext(vervoer_services, "NS API", "Levert real-time treinreisinformatie")
+System_Ext(routeplanner_service, "Maps API", "Biedt routeplanning en alternatieve reisopties")
+System_Ext(activiteiten_services, "Tripadvisor API", "Biedt informatie over attracties en bezienswaardigheden")
+System_Ext(eten_services, "UberEats API", "Biedt een overzicht van restaurants en cafés")
 
-' Relaties gebruiker naar componenten
-Rel(reiziger, frontend, "Gebruikt via webbrowser")
-Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
+Rel(frontend, auth_service, "Gebruikers loggen in via frontend (HTTPS)")
+Rel(frontend, payment_service, "Verwerkt betalingen via frontend (REST API, JSON/HTTPS)")
 
-' Relaties tussen componenten binnen TripTop
-Rel(frontend, backend, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
-Rel_L(backend, database, "Leest/schrijft gegevens naar database via JDBC")
+Rel(auth_service, auth_repository, "Beheert gebruikersgegevens (JPA)")
+Rel(auth_service, identity_provider, "Verifieert gebruikers via HTTPS")
 
-' Relaties backend naar externe systemen
-Rel(backend, identiteits_provider, "Authenticeert gebruikers (HTTPS)")
-Rel(backend, betalings_provider, "Verwerkt betalingen via REST API (JSON/HTTPS)")
+Rel(payment_service, payment_repository, "Beheert transacties (JPA)")
+Rel(payment_service, payment_adapter, "Gebruikt adapter voor Stripe API")
+Rel(payment_adapter, payment_provider, "Verwerkt betalingen via REST API (JSON/HTTPS)")
 
-Rel(backend, boeking, "Haalt overnachtingsmogelijkheden op en boekt via REST API (JSON/HTTPS)")
-Rel(backend, vervoersdiensten, "Haalt vervoersmogelijkheden op en boekt via REST API (JSON/HTTPS)")
-Rel(backend, routeplanner_dienst, "Haalt routes op via REST API (JSON/HTTPS)")
-Rel(backend, activiteiten_diensten, "Haalt activiteiten/excursies op en boekt via REST API (JSON/HTTPS)")
-Rel(backend, eet_diensten, "Haalt eet- en drinkmogelijkheden op via REST API (JSON/HTTPS)")
+Rel(payment_service, booking_service, "Na succesvolle betaling: Beheert boekingen (REST API, JSON/HTTPS)")
+Rel(payment_service, travel_service, "Na succesvolle betaling: Haalt reisopties op (REST API, JSON/HTTPS)")
+Rel(payment_service, activity_service, "Na succesvolle betaling: Haalt activiteiten op (REST API, JSON/HTTPS)")
+
+Rel(booking_service, booking_repository, "Beheert boekingsgegevens (JPA)")
+Rel(booking_service, booking_adapter, "Gebruikt adapter voor Booking API")
+Rel(booking_adapter, booking, "Beheert boekingen via REST API (JSON/HTTPS)")
+
+Rel(travel_service, travel_repository, "Beheert reisgegevens (JPA)")
+Rel(travel_service, travel_adapter, "Gebruikt adapter voor NS API")
+Rel(travel_adapter, vervoer_services, "Haalt vervoersinformatie op via REST API (JSON/HTTPS)")
+
+Rel(travel_service, routeplanner_adapter, "Gebruikt adapter voor Maps API")
+Rel(routeplanner_adapter, routeplanner_service, "Vraagt routes op via REST API (JSON/HTTPS)")
+
+Rel(activity_service, activity_repository, "Beheert activiteitengegevens (JPA)")
+Rel(activity_service, activity_adapter, "Gebruikt adapter voor Tripadvisor API")
+Rel(activity_adapter, activiteiten_services, "Haalt activiteiten op via REST API (JSON/HTTPS)")
+
+Rel(activity_service, food_adapter, "Gebruikt adapter voor UberEats API")
+Rel(food_adapter, eten_services, "Haalt eet- en drinkmogelijkheden op via REST API (JSON/HTTPS)")
+
 @enduml
