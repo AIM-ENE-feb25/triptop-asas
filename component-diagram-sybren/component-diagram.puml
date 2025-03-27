@@ -6,17 +6,17 @@ title Component diagram van TripTop voor het TripTop systeem
 Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
 Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
 
-System_Boundary(triptop, "TripTop") {
-    Container(controller, "BoekingController", "Spring MVC REST Controller")
-    Container(service, "BoekingService", "Bevat businesslogica", "Bevat businesslogica")
-    Container(facade, "FacadeService", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
-    Container(boeking_repository, "BoekingRepository", "Verantwoordelijk voor het ophalen van informatie uit booking.com, het cachen daarvan en het automatisch schakelen tussen de gecachde data en realtime data op basis van de beschikbaarheid")
-    Container(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
-    Container(triptop_service, "TripTopService", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
+Container_Boundary(triptop, "Boeking Systeem") {
+    Container(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
+    Container(service, "BoekingService", "Java, Spring Boot", "Bevat businesslogica voor verwerken boeking")
+    Container(facade, "FacadeService", "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
+    Container(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
+    Container(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
+    Container(triptop_service, "TripTopService", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
 }
 
  Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
- Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+ ContainerDb(database, "Database", "MSSQL", "Opslag van boekingen")
 
 System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accommodaties,boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
 
@@ -27,12 +27,12 @@ Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
 
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, controller, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
-Rel(controller, service, "Geeft verzoeken door aan de service")
-Rel(service, facade, "")
-Rel(service, boeking_repository, "")
-Rel(boeking_repository, database, "")
-Rel(facade, booking_com_adapter, "")
-Rel(facade, triptop_service, "Leest/schrijft gegevens naar database via JDBC")
+Rel(controller, service, "Geeft verzoeken door aan de service", "REST")
+Rel(service, facade, "Geeft verzoeken door aan de facade", "REST")
+Rel(service, boeking_repository, "Geeft opgehaalde data mee aan de repository", "REST")
+Rel(boeking_repository, database, "Slaat boekingen op", "JSON/HTTPS")
+Rel(facade, booking_com_adapter, "Vraagt overnachtingsmogelijkheden op", "REST")
+Rel(facade, triptop_service, "Haalt overnachtingsmogelijkheden intern op.", "REST")
 ' Relaties backend naar externe systemen
-Rel_U(booking_com_adapter, booking, "Haalt overnachtingsmogelijkheden op en boekt via REST API (JSON/HTTPS)")
+Rel_U(booking_com_adapter, booking, "Haalt overnachtingsmogelijkheden op via REST API", "JSON/HTTPS")
 @enduml
