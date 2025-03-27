@@ -9,7 +9,7 @@ Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vrag
 System_Boundary(triptop, "TripTop") {
     Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
     Container(backend, "Backend", "Java, Spring Boot", "Verwerkt boekingen, beheert bouwstenen en integreert externe services")
-    Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+    Container(database, "Database", "MSSQL", "Slaat reizen, bouwstenen en gebruikersgegevens op")
 }
 
 System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On voor testdoeleinden")
@@ -26,7 +26,7 @@ Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
 
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, backend, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
-Rel_L(backend, database, "Leest/schrijft gegevens naar database via JDBC")
+Rel_L(backend, database, "Leest/schrijft gegevens naar database via JDBC","JDBC/SQL")
 
 ' Relaties backend naar externe systemen
 Rel(backend, identity_provider, "Authenticeert gebruikers  (HTTPS)")
