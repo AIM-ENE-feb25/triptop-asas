@@ -297,6 +297,15 @@ Voor het TripTop-systeem hebben we overwogen om een API gateway te implementeren
 | **Schaalbaarheid** | \- | ++ | + |
 | **Ontwikkelingssnelheid** | ++ | \- | + |
 
+#### Bronnen
+
+- Venturelli, I. (2024, December 6). Choosing the right Java microservices framework: Spring Boot, Quarkus, Micronaut, and beyond. Medium. https://medium.com/codex/choosing-the-right-java-microservices-framework-spring-boot-quarkus-micronaut-and-beyond-e53f11704e58
+
+- Chmielarz, M. (2025, March 24). Overview of next-generation Java frameworks. SoftwareMill. https://softwaremill.com/overview-of-next-generation-java-frameworks/
+
+- Dansiviter. (2021, June 27). Opinionated take on Java Microservices Frameworks. DEV Community. https://dev.to/dansiviter/opinionated-take-on-java-microservices-frameworks-4ebh
+
+
 #### Besluit
 
 We hebben besloten om geen API gateway te implementeren in ons systeem. In plaats daarvan blijft onze backend direct communiceren met externe services via REST API's. Dit is belangrijk voor het TripTop-systeem omdat een eenvoudigere architectuur met minder complexiteit beter past bij onze huidige schaal.
