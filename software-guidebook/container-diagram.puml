@@ -4,7 +4,6 @@
 title Container diagram van TripTop voor het TripTop systeem
 
 Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
-Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
 
 System_Boundary(triptop, "TripTop") {
     Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
@@ -22,7 +21,6 @@ System_Ext(eten_services, "UberEats API", "Biedt een overzicht van restaurants, 
 
 ' Relaties gebruiker naar containers
 Rel(reiziger, frontend, "Gebruikt via webbrowser")
-Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
 
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, backend, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")

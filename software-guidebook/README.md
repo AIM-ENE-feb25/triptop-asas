@@ -19,7 +19,6 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 
 #### Gebruikers:
 * **Reiziger**: Plant, boekt, annuleert en beheert reizen zelfstandig op basis van persoonlijke voorkeuren.
-* **Reis Agent**: Biedt tweedelijns ondersteuning aan reizigers met vragen of problemen.
 
 #### Externe Systemen:
 * **Overnachtingen** (Booking): Leveren accommodatiemogelijkheden.
@@ -31,7 +30,7 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 * **Identity Provider** (WireMock): Zorgt voor centrale aanmelding zonder extra account.
 * **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
 
-
+We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
 
 ## 3. Functional Overview
 
@@ -104,6 +103,10 @@ Het volgende diagram toont de hoofdcomponenten van het Triptop-systeem en hun in
 * **Database**: Slaat reis- en gebruikersgegevens op.
 
 De container diagram toont in meer detail hoe Triptop integreert met de verschillende externe diensten via API's en hoe de interne componenten met elkaar communiceren.
+
+We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
+
+
 ### 2.2 Dynamische Container Diagram
 ### 7.2.1  Inloggen
 
@@ -111,49 +114,49 @@ De container diagram toont in meer detail hoe Triptop integreert met de verschil
 
 Toelichting
 
-    Gebruiker voert inloggegevens in:
-    De gebruiker typt zijn gebruikersnaam en wachtwoord in de Frontend (de gebruikersinterface gebouwd met React). Deze stap vindt plaats via een beveiligde HTTPS-verbinding.
+Gebruiker voert inloggegevens in:
+De gebruiker typt zijn gebruikersnaam en wachtwoord in de Frontend (de gebruikersinterface gebouwd met React). Deze stap vindt plaats via een beveiligde HTTPS-verbinding.
 
-    Verzenden van het inlogverzoek:
-    De Frontend stuurt het inlogverzoek (in JSON-formaat) naar de Backend, die is gebouwd met Java en Spring Boot.
+Verzenden van het inlogverzoek:
+De Frontend stuurt het inlogverzoek (in JSON-formaat) naar de Backend, die is gebouwd met Java en Spring Boot.
 
-    Authenticatie door de externe identiteitprovider:
-    De Backend stuurt het verzoek door naar de WireMock API, die in dit geval een externe service is die de centrale identiteitsverificatie en SSO (Single Sign-On) simuleert. Deze service controleert de inloggegevens en retourneert een token en gebruikersinformatie.
+Authenticatie door de externe identiteitprovider:
+De Backend stuurt het verzoek door naar de WireMock API, die in dit geval een externe service is die de centrale identiteitsverificatie en SSO (Single Sign-On) simuleert. Deze service controleert de inloggegevens en retourneert een token en gebruikersinformatie.
 
-    Ophalen en verwerken van gebruikersdata:
-    Na ontvangst van het token vraagt de Backend via JDBC/SQL de bijbehorende gebruikersgegevens op uit de Database.
+Ophalen en verwerken van gebruikersdata:
+Na ontvangst van het token vraagt de Backend via JDBC/SQL de bijbehorende gebruikersgegevens op uit de Database.
 
-    Terugkoppeling naar de Frontend:
-    De Backend stuurt het token en de profielinformatie terug naar de Frontend, die deze informatie vervolgens toont aan de gebruiker, zodat deze als ingelogd wordt herkend.
+Terugkoppeling naar de Frontend:
+De Backend stuurt het token en de profielinformatie terug naar de Frontend, die deze informatie vervolgens toont aan de gebruiker, zodat deze als ingelogd wordt herkend.
 
 ### 7.2.2 Reis Boeken
 ![Reis Boeken](dynamisch-container-diagrammen/reis-boeken-dynamisch-diagram.png)
 
 Toelichting
 
-    Selectie van reis:
-    De gebruiker kiest via de Frontend (React) de vertrek- en bestemmingslocatie en geeft aan dat hij een reis met vervoer met een huurauto wil boeken. Deze selectie vindt plaats via een HTTPS-verbinding.
+Selectie van reis:
+De gebruiker kiest via de Frontend (React) de vertrek- en bestemmingslocatie en geeft aan dat hij een reis met vervoer met een huurauto wil boeken. Deze selectie vindt plaats via een HTTPS-verbinding.
 
-    Verzenden van reisgegevens:
-    De Frontend stuurt de geselecteerde reisdetails (in JSON) naar de Backend (Java/Spring Boot). Dit omvat informatie zoals de locaties, de gewenste datum en tijd, en de keuze voor een huurauto als vervoersmiddel.
+Verzenden van reisgegevens:
+De Frontend stuurt de geselecteerde reisdetails (in JSON) naar de Backend (Java/Spring Boot). Dit omvat informatie zoals de locaties, de gewenste datum en tijd, en de keuze voor een huurauto als vervoersmiddel.
 
-    Route-informatie opvragen:
-    De Backend vraagt via de Maps API de routeinformatie op, zoals afstand en reistijd tussen de vertrek- en bestemmingslocatie. De Maps API retourneert deze gegevens weer via HTTPS/JSON.
+Route-informatie opvragen:
+De Backend vraagt via de Maps API de routeinformatie op, zoals afstand en reistijd tussen de vertrek- en bestemmingslocatie. De Maps API retourneert deze gegevens weer via HTTPS/JSON.
 
-    Huurauto boeken:
-    Vervolgens roept de Backend de Booking API aan om de huurauto te reserveren. Hierbij worden onder andere de start- en einddatum en locatiegegevens meegegeven. De Booking API bevestigt de reservering.
+Huurauto boeken:
+Vervolgens roept de Backend de Booking API aan om de huurauto te reserveren. Hierbij worden onder andere de start- en einddatum en locatiegegevens meegegeven. De Booking API bevestigt de reservering.
 
-    Betaling verwerken:
-    Na de reservering verwerkt de Backend de betaling via de Stripe API. Stripe verwerkt de betaling en retourneert een betaalbevestiging.
+Betaling verwerken:
+Na de reservering verwerkt de Backend de betaling via de Stripe API. Stripe verwerkt de betaling en retourneert een betaalbevestiging.
 
-    Opslag van de transactie:
-    De Backend slaat alle reis-, reserverings- en betalingsgegevens op in de Database (via JDBC/SQL).
+Opslag van de transactie:
+De Backend slaat alle reis-, reserverings- en betalingsgegevens op in de Database (via JDBC/SQL).
 
-    Terugkoppeling naar de gebruiker:
-    Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserveringsnummer en betaalstatus, terug naar de Frontend. De Frontend toont deze bevestiging aan de gebruiker.
+Terugkoppeling naar de gebruiker:
+Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserveringsnummer en betaalstatus, terug naar de Frontend. De Frontend toont deze bevestiging aan de gebruiker.
 
-    Herstart van het proces:
-    Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
+Herstart van het proces:
+Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
 
 
 

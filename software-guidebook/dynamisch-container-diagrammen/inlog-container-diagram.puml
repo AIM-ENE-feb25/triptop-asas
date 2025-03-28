@@ -2,7 +2,7 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
 title Dynamisch Container Diagram – Inloggen
 
-Person(user, "Gebruiker (Reiziger)", "Wilt inloggen op TripTop")
+Person(user, "Reiziger", "Wilt inloggen op TripTop")
 
 System_Boundary(triptop, "TripTop") {
 Container(frontend, "Frontend", "React", "UI waar de gebruiker inlogt")
