@@ -19,7 +19,6 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 
 #### Gebruikers:
 * **Reiziger**: Plant, boekt, annuleert en beheert reizen zelfstandig op basis van persoonlijke voorkeuren.
-* **Reis Agent**: Biedt tweedelijns ondersteuning aan reizigers met vragen of problemen.
 
 #### Externe Systemen:
 * **Overnachtingen** (Booking): Leveren accommodatiemogelijkheden.
@@ -31,7 +30,7 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 * **Identity Provider** (WireMock): Zorgt voor centrale aanmelding zonder extra account.
 * **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
 
-
+We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
 
 ## 3. Functional Overview
 
@@ -104,6 +103,10 @@ Het volgende diagram toont de hoofdcomponenten van het Triptop-systeem en hun in
 * **Database**: Slaat reis- en gebruikersgegevens op.
 
 De container diagram toont in meer detail hoe Triptop integreert met de verschillende externe diensten via API's en hoe de interne componenten met elkaar communiceren.
+
+We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
+
+
 ### 2.2 Dynamische Container Diagram
 ### 7.2.1  Inloggen
 
@@ -111,49 +114,49 @@ De container diagram toont in meer detail hoe Triptop integreert met de verschil
 
 Toelichting
 
-    Gebruiker voert inloggegevens in:
-    De gebruiker typt zijn gebruikersnaam en wachtwoord in de Frontend (de gebruikersinterface gebouwd met React). Deze stap vindt plaats via een beveiligde HTTPS-verbinding.
+Gebruiker voert inloggegevens in:
+De gebruiker typt zijn gebruikersnaam en wachtwoord in de Frontend (de gebruikersinterface gebouwd met React). Deze stap vindt plaats via een beveiligde HTTPS-verbinding.
 
-    Verzenden van het inlogverzoek:
-    De Frontend stuurt het inlogverzoek (in JSON-formaat) naar de Backend, die is gebouwd met Java en Spring Boot.
+Verzenden van het inlogverzoek:
+De Frontend stuurt het inlogverzoek (in JSON-formaat) naar de Backend, die is gebouwd met Java en Spring Boot.
 
-    Authenticatie door de externe identiteitprovider:
-    De Backend stuurt het verzoek door naar de WireMock API, die in dit geval een externe service is die de centrale identiteitsverificatie en SSO (Single Sign-On) simuleert. Deze service controleert de inloggegevens en retourneert een token en gebruikersinformatie.
+Authenticatie door de externe identiteitprovider:
+De Backend stuurt het verzoek door naar de WireMock API, die in dit geval een externe service is die de centrale identiteitsverificatie en SSO (Single Sign-On) simuleert. Deze service controleert de inloggegevens en retourneert een token en gebruikersinformatie.
 
-    Ophalen en verwerken van gebruikersdata:
-    Na ontvangst van het token vraagt de Backend via JDBC/SQL de bijbehorende gebruikersgegevens op uit de Database.
+Ophalen en verwerken van gebruikersdata:
+Na ontvangst van het token vraagt de Backend via JDBC/SQL de bijbehorende gebruikersgegevens op uit de Database.
 
-    Terugkoppeling naar de Frontend:
-    De Backend stuurt het token en de profielinformatie terug naar de Frontend, die deze informatie vervolgens toont aan de gebruiker, zodat deze als ingelogd wordt herkend.
+Terugkoppeling naar de Frontend:
+De Backend stuurt het token en de profielinformatie terug naar de Frontend, die deze informatie vervolgens toont aan de gebruiker, zodat deze als ingelogd wordt herkend.
 
 ### 7.2.2 Reis Boeken
 ![Reis Boeken](dynamisch-container-diagrammen/reis-boeken-dynamisch-diagram.png)
 
 Toelichting
 
-    Selectie van reis:
-    De gebruiker kiest via de Frontend (React) de vertrek- en bestemmingslocatie en geeft aan dat hij een reis met vervoer met een huurauto wil boeken. Deze selectie vindt plaats via een HTTPS-verbinding.
+Selectie van reis:
+De gebruiker kiest via de Frontend (React) de vertrek- en bestemmingslocatie en geeft aan dat hij een reis met vervoer met een huurauto wil boeken. Deze selectie vindt plaats via een HTTPS-verbinding.
 
-    Verzenden van reisgegevens:
-    De Frontend stuurt de geselecteerde reisdetails (in JSON) naar de Backend (Java/Spring Boot). Dit omvat informatie zoals de locaties, de gewenste datum en tijd, en de keuze voor een huurauto als vervoersmiddel.
+Verzenden van reisgegevens:
+De Frontend stuurt de geselecteerde reisdetails (in JSON) naar de Backend (Java/Spring Boot). Dit omvat informatie zoals de locaties, de gewenste datum en tijd, en de keuze voor een huurauto als vervoersmiddel.
 
-    Route-informatie opvragen:
-    De Backend vraagt via de Maps API de routeinformatie op, zoals afstand en reistijd tussen de vertrek- en bestemmingslocatie. De Maps API retourneert deze gegevens weer via HTTPS/JSON.
+Route-informatie opvragen:
+De Backend vraagt via de Maps API de routeinformatie op, zoals afstand en reistijd tussen de vertrek- en bestemmingslocatie. De Maps API retourneert deze gegevens weer via HTTPS/JSON.
 
-    Huurauto boeken:
-    Vervolgens roept de Backend de Booking API aan om de huurauto te reserveren. Hierbij worden onder andere de start- en einddatum en locatiegegevens meegegeven. De Booking API bevestigt de reservering.
+Huurauto boeken:
+Vervolgens roept de Backend de Booking API aan om de huurauto te reserveren. Hierbij worden onder andere de start- en einddatum en locatiegegevens meegegeven. De Booking API bevestigt de reservering.
 
-    Betaling verwerken:
-    Na de reservering verwerkt de Backend de betaling via de Stripe API. Stripe verwerkt de betaling en retourneert een betaalbevestiging.
+Betaling verwerken:
+Na de reservering verwerkt de Backend de betaling via de Stripe API. Stripe verwerkt de betaling en retourneert een betaalbevestiging.
 
-    Opslag van de transactie:
-    De Backend slaat alle reis-, reserverings- en betalingsgegevens op in de Database (via JDBC/SQL).
+Opslag van de transactie:
+De Backend slaat alle reis-, reserverings- en betalingsgegevens op in de Database (via JDBC/SQL).
 
-    Terugkoppeling naar de gebruiker:
-    Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserveringsnummer en betaalstatus, terug naar de Frontend. De Frontend toont deze bevestiging aan de gebruiker.
+Terugkoppeling naar de gebruiker:
+Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserveringsnummer en betaalstatus, terug naar de Frontend. De Frontend toont deze bevestiging aan de gebruiker.
 
-    Herstart van het proces:
-    Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
+Herstart van het proces:
+Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
 
 
 
@@ -172,163 +175,181 @@ Toelichting
 
 > [!IMPORTANT]
 > Voeg toe: 3 tot 5 ADR's die beslissingen beschrijven die zijn genomen tijdens het ontwerpen en bouwen van de software.
+Hieronder volgt de volledige lijst van alle ADR's die tot op heden zijn opgesteld voor het Triptop-project. Elk document beschrijft een kritische architecturale of technologische keuze, inclusief de relevante context, de overwogen opties (met bijbehorende beslissingsfactoren), de uiteindelijke beslissing en de gevolgen voor het project. Deze ADR's vormen samen de basis voor de verdere ontwikkeling en implementatie van de Triptop-applicatie.
 
+---
 
-### **ADR-001: Gebruik van Stripe als betalingsprovider**
+## ADR-001: Keuze van Payment Service Provider (PSP)
 
-**Status:**  
+#### Status
 Geaccepteerd
 
-#### **Context**  
-Onze TripTop-applicatie moet een betalingssysteem hebben waarmee gebruikers hun reis gemakkelijk kunnen betalen. Andere externe systemen (zoals voor hotels of autohuur) hebben soms hun eigen betaalmethodes, maar dat kan leiden tot een rommelige en onduidelijke gebruikerservaring. Daarom willen we één enkel systeem gebruiken dat voor iedereen werkt.
-
-#### **Decision Forces**
-
-We hebben drie opties overwogen. Hier is een eenvoudige tabel met plussen en minnen om te laten zien wat goed (+) en minder goed (-) is aan elke optie:
-
-| **Optie**                   | **Uniformiteit** | **Veiligheid & Regels** | **Schaalbaarheid** | **Technische Moeilijkheid** | **Afhankelijkheid** | **Kosten** |
-|-----------------------------|------------------|-------------------------|--------------------|-----------------------------|---------------------|------------|
-| **Stripe**                  | ++               | ++                      | ++                 | +                           | -                   | +          |
-| **Externe API-betalingen**  | -                | -                       | -                  | ++                          | ++                  | ++         |
-| **Eigen Betaalinfrastructuur** | -             | -                       | -                  | -                           | ++                  | -          |
-
-- **Uniformiteit:** Stripe geeft één manier van betalen voor alle boekingen (++), terwijl externe systemen verschillende methoden hebben (-).
-- **Veiligheid & Regels:** Stripe voldoet aan belangrijke regels (zoals PCI-DSS en GDPR) (++), wat bij andere opties vaak niet zo duidelijk is (-).
-- **Schaalbaarheid:** Stripe groeit mee als er meer gebruikers komen (++), externe systemen zijn vaak beperkt (-).
-- **Technische Moeilijkheid:** Het opzetten van Stripe is relatief makkelijk (+), terwijl eigen oplossingen vaak moeilijker zijn (-).
-- **Afhankelijkheid:** Als we externe betaalmethoden gebruiken, zijn we erg afhankelijk van meerdere partijen (++), terwijl Stripe minder afhankelijk maakt (-).
-- **Kosten:** Stripe rekent wel kosten per transactie (+), maar dit is acceptabel vergeleken met de nadelen van andere opties (++ of -).
-
-#### **Beslissing**
-
-Wij kiezen voor **Stripe** als onze betalingsprovider.  
-- **Waarom?**  
-  - Stripe zorgt voor één uniforme betalingsmethode voor alle boekingen.  
-  - Het voldoet aan alle belangrijke veiligheidsregels en kan eenvoudig meeschalen.  
-  - Het maakt het technisch eenvoudiger en vermindert de afhankelijkheid van meerdere externe partijen.
-  
-#### **Consequenties**
-
-- Alles wordt via Stripe verwerkt, wat de gebruikerservaring eenvoudiger en consistenter maakt.
--  Stripe voldoet aan alle belangrijke veiligheidsnormen.
--  Naarmate het aantal gebruikers groeit, kan Stripe meeschalen zonder extra moeite.
-- Stripe rekent kosten per transactie, wat de marges kan beïnvloeden.
-- Als Stripe problemen heeft, heeft dit invloed op onze betalingsverwerking.
-- Extra werk is nodig om Stripe goed te integreren en te beheren.
-
-
-
-### ADR-002: Besluit over API voor routebeschrijving
-
 #### Context
-Voor onze applicatie hebben we een API nodig die routebeschrijvingen kan genereren. De API moet nauwkeurige route-informatie bieden, goed schaalbaar zijn en eenvoudig te integreren met onze bestaande infrastructuur. Belangrijke overwegingen zijn kosten, dekking en beschikbaarheid.
+Onze Triptop-applicatie heeft een geïntegreerd betalingssysteem nodig dat een consistente gebruikerservaring biedt. In plaats van een eigen betaalinfrastructuur te bouwen, maken we gebruik van externe betalingsproviders. We overwegen zowel dedicated PSP’s (zoals Stripe, Adyen en PayPal) als de optie **Externe API-betalingen**. Bij externe API-betalingen handelen we de betaling af via API’s van partners (bijvoorbeeld via platforms zoals UberEats) die direct geld innen via een enkel endpoint. Hoewel dit vanuit gebruikersperspectief aantrekkelijk lijkt, brengt het een hoge afhankelijkheid en extra integratiecomplexiteit met zich mee.
 
-#### Besluit
-We hebben besloten om de rapidAPI te gebruiken voor de routebeschrijving in onze app. Dit komt omdat deze geen kosten met zich mee brengt en omdat er geen creditcard vereist is om deze te gebruiken. Ook is dit een "fake" API, wat betekent dat deze geen echte routebeschrijvingen genereert, maar wel de functionaliteit biedt om te testen of de routebeschrijvingen in de app werken. Echter krijg je van deze API alleen een JSON bestand met een routebeschrijving, en geen visuele weergave van de route.
+#### Overwogen opties (Beslissingsfactoren)
 
-| Criteria                   | RapidAPI | Google Maps API | Mapbox Directions API |
-|----------------------------|----------|-----------------|-----------------------|
-| **Nauwkeurigheid**         | --       | ++              | +                     |
-| **Kosten**                 | ++       | --              | -                     |
-| **Integratiegemak**        | ++       | ++              | ++                    |
-| **Beschikbaarheid**        | +        | ++              | ++                    |
-| **Visualisatie opties**    | --       | ++              | ++                    |
-| **Documentatie**           | +        | ++              | +                     |
+| **Criteria**                | **Stripe** | **Adyen** | **PayPal** | **Externe API-betalingen** | **Eigen infrastructuur** |
+|-----------------------------|:----------:|:---------:|:----------:|:--------------------------:|:------------------------:|
+| **Uniformiteit**            |     ++    |    ++     |     +     |             -              |            -           |
+| **Veiligheid & Regels**     |     ++    |    ++     |     +     |             -              |            -           |
+| **Schaalbaarheid**          |     ++    |    ++     |     +     |             -              |            -           |
+| **Technische Moeilijkheid** |     ++    |     +     |     +     |             -              |            --          |
+| **Afhankelijkheid**         |     ++    |    ++     |     +     |             --             |            --          |
+| **Kosten**                  |     +     |     +     |     +     |             ?              |            -           |
+| **Gratis (Sandbox/Test)**   |     ++    |     +     |    ++     |             -              |            --          |
 
-#### Alternatieven
-1. **Google Maps API** – Zeer nauwkeurig en breed ondersteund, maar relatief duur bij schaalvergroting.
-3. **Mapbox Directions API** – Goede visualisatie-opties en concurrerend geprijsd, maar minder dekking dan Google Maps.
+#### Beslissing
+Hoewel zowel Stripe als Adyen sterke scores behalen op uniformiteit, veiligheid en schaalbaarheid, onderscheidt Stripe zich door een superieure developer experience en een zeer toegankelijke gratis sandbox-omgeving. Deze factoren maken de integratie eenvoudiger en versnellen onze time-to-market. Daarom kiezen we voor **Stripe** als onze primaire PSP.
 
 #### Consequenties
-- **Voordelen**: We krijgen een robuuste en goed gedocumenteerde API die eenvoudig te integreren is.
-- **Nadelen**: Afhankelijk van de gekozen API kunnen er kosten en beperkingen zijn in gebruik of beschikbaarheid.
-- **Risico’s**: Mogelijke latere migratie naar een andere API als onze behoeften veranderen.
+- **Uniforme Betalingsmethode:** Alle transacties verlopen via Stripe, wat zorgt voor een consistente gebruikerservaring.
+- **Veiligheid:** Stripe voldoet aan strikte veiligheidsnormen, essentieel voor de bescherming van gevoelige betalingsgegevens.
+- **Schaalbaarheid:** Het systeem kan eenvoudig meegroeien met een toenemend gebruikersaantal zonder significante extra investeringen.
+- **Integratie:** De developer-friendly API en uitstekende documentatie zorgen voor een gestandaardiseerde en relatief eenvoudige implementatie.
+- **Afhankelijkheid:** Hoewel we afhankelijk zijn van een externe provider, is dit risico beheersbaar via duidelijke contracten en SLA’s.
+- **Kosten:** De transactiekosten zijn marktconform en voorspelbaar; eventuele tariefwijzigingen worden nauwlettend gemonitord.
+- **Gratis (Sandbox/Test):** De robuuste, gratis sandbox-omgeving van Stripe versnelt de integratie- en testfase aanzienlijk.
+
+---
+
+## ADR-002: Besluit over API voor routebeschrijving
 
 #### Status
-- [✓] Goedgekeurd
-
-
-### ADR-003 Framework keuze voor Triptop systeem
-
+Geaccepteerd
 
 #### Context
+Onze applicatie heeft een API nodig die routebeschrijvingen kan genereren. De API moet nauwkeurige route-informatie bieden, goed schaalbaar zijn en eenvoudig te integreren zijn in de bestaande infrastructuur.
 
-Om te komen tot een goed werkend prototype is het noodzakelijk om de keuze te maken voor de juiste
-framework om dit te realiseren.
+#### Overwogen opties (Beslissingsfactoren)
 
+| **Criteria**               | **RapidAPI** | **Google Maps API** | **Mapbox Directions API** |
+|----------------------------|--------------|---------------------|---------------------------|
+| **Nauwkeurigheid**         | --           | ++                  | +                         |
+| **Kosten**                 | ++           | --                  | -                         |
+| **Integratiegemak**        | ++           | ++                  | ++                        |
+| **Beschikbaarheid**        | +            | ++                  | ++                        |
+| **Visualisatie opties**    | --           | ++                  | ++                        |
+| **Documentatie**           | +            | ++                  | +                         |
 
-#### Overwogen Opties
-
-| **Criteria**                     | **Spring Boot** | **Quarkus** | **Micronaut** | **Jakarta EE** | **Vert.x** | **Dropwizard** | **Helidon** |
-|----------------------------------|-----------------|-------------|---------------|----------------|------------|----------------|-------------|
-| **Makkelijk in gebruik**         | ++              | +           | +             |                | -          | +              |             |
-| **Snelheid opstarttijd**         |        | ++          | +             | -              | ++         |       | +           |
-| **Geheugengebruik**              |        | -           | -             | +              | -          |       | _           |
-
-
-
-#### Besluit
-We hebben gekozen om gebruik te maken van het framework Spring Boot, omdat dit het makkelijkste in gebruik is en een gemiddelde snelheid heeft.  Dit is belangrijk voor het prototype, omdat we snel een werkend prototype willen hebben en het makkelijk in gebruik moet zijn. 
-Daarnaast hebben wij al ervaring met dit framework, daarom is dit een logische keuze.
-
-#### Status
-Accepted
+#### Beslissing
+We kiezen voor **RapidAPI** omdat deze optie geen kosten met zich meebrengt en geen creditcard vereist voor gebruik. Hoewel het een "fake" API betreft en alleen een JSON-bestand met routebeschrijving levert (zonder visuele weergave), biedt het voldoende functionaliteit voor testdoeleinden.
 
 #### Consequenties
-Door gebruik te maken van Spring Boot, zullen wij minder snelheidsproblemen hebben en is het makkelijker om het prototype te realiseren. 
-Daarnaast zullen wij minder tijd kwijt zijn aan het leren van een nieuw framework, omdat wij al ervaring hebben met Spring Boot.
+- **Integratie:** Eenvoudige en kosteneffectieve integratie.
+- **Nauwkeurigheid & Visualisatie:** De beperkte nauwkeurigheid en visuele ondersteuning zijn acceptabel voor de testfase.
+- **Toekomst:** Indien de functionele eisen in de toekomst veranderen, kan er eventueel worden gemigreerd naar een andere API.
 
+---
 
+## ADR-003: Framework keuze voor TripTop-systeem
 
-
-### 8.2. ADR-004 API Gateway keuze voor Triptop systeem
+#### Status
+Geaccepteerd
 
 #### Context
+Voor het realiseren van een werkend prototype is het essentieel het juiste framework te kiezen. Het gekozen framework moet:
+- Eenvoudig in gebruik zijn.
+- Een acceptabele opstarttijd en geheugengebruik hebben.
+- Beschikken over een robuust ecosysteem en brede community-ondersteuning.
+- Direct aansluiten bij de kennis en ervaring van het team.
 
-Voor het TripTop-systeem hebben we overwogen om een API gateway te implementeren als tussenlaag tussen onze backend en de externe services waarmee we communiceren. Een API gateway kan voordelen bieden zoals gecentraliseerde authenticatie, rate limiting, en monitoring. Echter, de huidige schaal en complexiteit van ons systeem vereisen een zorgvuldige afweging van de toegevoegde waarde versus de kosten en complexiteit.
+#### Overwogen opties (Beslissingsfactoren)
 
-#### Overwogen Opties
+| **Criteria**               | **Spring Boot** | **Quarkus** | **Micronaut** | **Jakarta EE** | **Vert.x** | **Dropwizard** | **Helidon** |
+|----------------------------|:---------------:|:-----------:|:-------------:|:--------------:|:----------:|:--------------:|:-----------:|
+| **Makkelijk in gebruik**   | ++              | +           | +             | -              | --         | +              | -           |
+| **Opstarttijd**            | -               | ++          | +             | --             | ++         | 0              | +           |
+| **Geheugengebruik**        | -               | ++          | +             | 0              | ++         | 0              | +           |
+| **Community & Ecosysteem** | ++              | +           | +             | 0              | -          | 0              | -           |
+| **Team Ervaring**          | ++              | --          | --            | --             | --         | --             | --          |
 
-| **Criteria** | **Geen API Gateway** | **API Gateway Implementatie** | **Backend-for-Frontend (BFF)** |
-| --- | --- | --- | --- |
-| **Architectuur complexiteit** | ++ | \- | \-- |
-| **Latentie** | ++ | \- | + |
-| **Kosten** | ++ | \-- | \- |
-| **Beheer & onderhoud** | + | \- | \-- |
-| **Schaalbaarheid** | \- | ++ | + |
-| **Ontwikkelingssnelheid** | ++ | \- | + |
-
-#### Besluit
-
-We hebben besloten om geen API gateway te implementeren in ons systeem. In plaats daarvan blijft onze backend direct communiceren met externe services via REST API's. Dit is belangrijk voor het TripTop-systeem omdat een eenvoudigere architectuur met minder complexiteit beter past bij onze huidige schaal.
-
-#### Status
-
-Accepted
+#### Beslissing
+Wij kiezen voor **Spring Boot** vanwege de uitstekende gebruiksvriendelijkheid, uitgebreide documentatie en omdat ons team hier veel ervaring mee heeft. Dit zorgt voor een kortere implementatietijd en snellere probleemoplossing.
 
 #### Consequenties
+- **Versneld ontwikkelproces:** Door de bekende technologie kan het prototype snel worden ontwikkeld.
+- **Betrouwbaarheid:** De grote community en robuuste ondersteuning zorgen voor een stabiele basis.
+- **Minder leertijd:** De bestaande kennis binnen het team leidt tot lagere ontwikkelkosten.
+- **Beperkte optimalisatie:** Nadelen op het gebied van opstarttijd en geheugengebruik zijn in de context van een prototype acceptabel.
 
-Door geen API gateway te implementeren, bereiken we:
+---
 
--   Lagere kosten en eenvoudiger beheer van onze infrastructuur
-    
--   Minder infrastructuurcomponenten om te onderhouden
-    
--   Snellere responstijden door directe communicatie
-    
--   Snellere ontwikkeling van nieuwe functionaliteiten
-    
+## ADR-004: API Gateway keuze voor TripTop-systeem
 
-We accepteren hierbij de volgende nadelen:
+#### Status
+Geaccepteerd
 
--   Geen gecentraliseerde plek voor cross-cutting concerns zoals rate limiting of monitoring
-    
--   Onze backend moet alle integratiefuncties zelf afhandelen
-    
--   Schaalbaarheid kan in de toekomst een uitdaging worden bij toenemende complexiteit
-    
+#### Context
+Voor het TripTop-systeem is overwogen een API gateway te implementeren als tussenlaag tussen onze backend en externe services. Een API gateway kan zorgen voor gecentraliseerde authenticatie, rate limiting en monitoring, maar brengt ook extra complexiteit met zich mee.
 
-Deze beslissing zal worden herzien indien de schaal of eisen van ons systeem significant veranderen, bijvoorbeeld bij een toename in het aantal gebruikers of externe services waarmee we integreren.
+#### Overwogen opties (Beslissingsfactoren)
+
+| **Criteria**                    | **Geen API Gateway** | **API Gateway Implementatie** | **Backend-for-Frontend (BFF)** |
+|---------------------------------|----------------------|-------------------------------|--------------------------------|
+| **Architectuur complexiteit**   | ++                   | -                             | --                             |
+| **Latentie**                    | ++                   | -                             | +                              |
+| **Kosten**                      | ++                   | --                            | -                              |
+| **Beheer & onderhoud**          | +                    | -                             | --                             |
+| **Schaalbaarheid**              | -                    | ++                            | +                              |
+| **Ontwikkelingssnelheid**       | ++                   | -                             | +                              |
+
+#### Beslissing
+Wij kiezen ervoor **geen API Gateway** te implementeren. Onze backend communiceert direct met externe services via REST API’s, wat leidt tot een eenvoudigere architectuur en snellere ontwikkeling.
+
+#### Consequenties
+- **Lagere kosten & eenvoudiger beheer:** Minder componenten om te onderhouden.
+- **Snellere responstijden:** Directe communicatie met externe services.
+- **Geen centrale plek voor cross-cutting concerns:** Zaken zoals rate limiting en monitoring moeten elders worden opgevangen.
+- **Schaalbaarheid:** Mogelijke uitdagingen bij toekomstige groei, maar voor de huidige schaal past de directe aanpak het best.
+
+---
+
+## ADR-005: Database Keuze voor Triptop-systeem
+
+#### Status
+Geaccepteerd
+
+#### Context
+Triptop is een online platform dat reizigers in staat stelt om zelfstandig reizen te plannen, boeken, annuleren en beheren. Aangezien kritieke gegevens zoals boekingen, gebruikersprofielen, reis- en betalingsinformatie worden verwerkt, is het essentieel dat de gekozen database:
+- Sterke transactionele integriteit (ACID-naleving) biedt.
+- Hoge dataconsistentie garandeert.
+- Beschikt over een robuust ecosysteem en goede ondersteuning.
+- Schaalbaar is voor groeiende gebruikersaantallen.
+- Kosteneffectief is en aansluit bij de bestaande expertise van het team.
+
+Gezien de uitgebreide ervaring van ons team met MSSQL en het feit dat we MSSQL kosteloos kunnen gebruiken, is dit een belangrijke factor in onze beslissing.
+
+#### Overwogen opties (Beslissingsfactoren)
+
+| **Criteria**                      | **MSSQL** | **PostgreSQL** | **MongoDB** |
+|-----------------------------------|:---------:|:--------------:|:-----------:|
+| **ACID-naleving**                 | ++        | ++             | --          |
+| **Dataconsistentie**              | ++        | ++             | --          |
+| **Schaalbaarheid**                | +         | +              | ++          |
+| **Community & Ecosysteem**        | +         | ++             | +           |
+| **Gebruiksgemak**                 | ++        | +              | +           |
+| **Licenties & Kosten**            | ++        | ++             | ++          |
+| **Team Ervaring**                 | ++        | +              | --          |
+
+*Opmerking: In onze context kunnen we MSSQL gratis gebruiken, wat resulteert in een score van "++" bij Licenties & Kosten.*
+
+#### Beslissing
+Wij kiezen voor **MSSQL** als onze primaire database-oplossing voor Triptop. Deze keuze is gebaseerd op:
+- **Team Ervaring:** Ons team heeft uitgebreide ervaring met MSSQL, wat zorgt voor een kortere implementatietijd en snellere probleemoplossing.
+- **Gebruiksgemak:** MSSQL biedt een geïntegreerde, ontwikkelaarsvriendelijke omgeving met uitgebreide tooling en ondersteuning.
+- **Transactionele Integriteit & Dataconsistentie:** MSSQL voldoet volledig aan de ACID-vereisten, essentieel voor het verwerken van boekingen en betalingen.
+- **Licenties & Kosten:** Aangezien we MSSQL gratis kunnen gebruiken, vormen de licentiekosten geen belemmering.
+
+#### Consequenties
+- **Transactionele Integriteit:** Robuuste ACID-naleving garandeert betrouwbare verwerking van boekingen en betalingen.
+- **Dataconsistentie:** Essentiële gegevens blijven consistent en betrouwbaar.
+- **Gebruiksgemak en Ondersteuning:** De uitgebreide ervaring van het team met MSSQL leidt tot een snellere implementatie en efficiëntere probleemoplossing.
+- **Schaalbaarheid:** MSSQL voldoet ruim voldoende aan de huidige en nabije toekomstige eisen.
+- **Licentiekosten:** Geen bijkomende kosten dankzij gratis gebruik, wat de totale investering verlaagt.
+- **Ecosysteem:** MSSQL biedt een stabiel en uitgebreid ecosysteem met ondersteuning vanuit Microsoft.
+
+---
 
 ### 8.5. ADR-005 TITLE
 

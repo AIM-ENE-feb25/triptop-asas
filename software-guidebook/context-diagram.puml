@@ -3,7 +3,6 @@
 title Systeem Context Diagram voor TripTop Applicatie
 SHOW_PERSON_OUTLINE()
 Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/ past aan en betaalt")
-Person(ondersteuner, "Reis Agent", "Tweede­lijns support; helpt de reiziger bij vragen.")
 System_Boundary("TripTop","TripTop"){
     System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
 }
@@ -17,7 +16,6 @@ System_Ext(identity, "WireMock API", "Biedt centrale login zonder extra account 
 System_Ext(payment, "Stripe API", "Verwerkt betalingen voor TripTop")
 
 Rel(reiziger, triptop, "Gebruikt TripTop voor het plannen, boeken, aanpassen en annuleren van de reis")
-Rel(ondersteuner, triptop, "Ondersteunt de reiziger via TripTop (advies)")
 Rel(triptop, booking, "Haalt overnachtings­mogelijkheden en autohuur­mogelijkheden op en boekt deze indien nodig")
 Rel(triptop, activiteiten, "Haalt activiteiten/excursies op en boekt deze")
 Rel(triptop, vervoer1, "Haalt reisopties (trein) op en boekt deze")
