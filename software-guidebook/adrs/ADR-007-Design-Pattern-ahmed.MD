@@ -1,4 +1,4 @@
-# ADR-001: Gebruik van het Adapter Pattern voor Externe Authenticatie Integratie  
+# ADR-007: Gebruik van het Adapter Pattern voor Inloggen
 ## **Status:** Geaccepteerd
 
 ## **Context**  
