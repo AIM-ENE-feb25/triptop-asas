@@ -1,54 +1,25 @@
 @startuml
 
 package "Controller Layer" {
-    class LoginController {
-        + login(username: String, password: String): ResponseEntity
-    }
     class PaymentController {
         + processPayment(paymentRequest: PaymentRequest): ResponseEntity
-    }
-    class TripController {
-        + planTrip(tripRequest: TripRequest): ResponseEntity
     }
 }
 
 package "Service Layer" {
-    class LoginService {
-        + authenticateUser(username: String, password: String): User
-    }
     class PaymentService {
         + handlePayment(paymentRequest: PaymentRequest): PaymentResponse
     }
-    class TripService {
-        + manageTrip(tripRequest: TripRequest): TripResponse
-    }
+
 }
 
 package "Repository Layer" {
-    interface UserRepository {
-        + findByUsername(username: String): User
-        + save(user: User): void
-    }
-    interface TripRepository {
-        + findById(id: Long): Trip
-        + save(trip: Trip): void
-    }
     interface PaymentRepository {
         + save(payment: Payment): void
     }
 }
 
 package "Model Layer" {
-    class User {
-        String username
-        String passwordHash
-    }
-    class Trip {
-        Long id
-        String destination
-        Date startDate
-        Date endDate
-    }
     class Payment {
         Long id
         Double amount
@@ -63,55 +34,18 @@ package "Adapter Layer" {
     class StripeAdapter implements PaymentGateway {
         + processPayment(amount: Double): PaymentResponse
     }
-    class PayPalAdapter implements PaymentGateway {
-        + processPayment(amount: Double): PaymentResponse
-    }
 
-    interface TripProvider {
-        + fetchAvailableTrips(criteria: TripCriteria): List<Trip>
-        + bookTrip(tripId: Long): BookingConfirmation
-    }
-    class BookingApiAdapter implements TripProvider {
-        + fetchAvailableTrips(criteria: TripCriteria): List<Trip>
-        + bookTrip(tripId: Long): BookingConfirmation
-    }
-    class NsApiAdapter implements TripProvider {
-        + fetchAvailableTrips(criteria: TripCriteria): List<Trip>
-        + bookTrip(tripId: Long): BookingConfirmation
-    }
 
-    interface AuthProvider {
-        + authenticate(username: String, password: String): AuthResponse
-    }
-    class WireMockAuthAdapter implements AuthProvider {
-        + authenticate(username: String, password: String): AuthResponse
-    }
-    class Auth0Adapter implements AuthProvider {
-        + authenticate(username: String, password: String): AuthResponse
-    }
 }
 
 PaymentService --> PaymentGateway
 StripeAdapter ..|> PaymentGateway
-PayPalAdapter ..|> PaymentGateway
 
-TripService --> TripProvider
-BookingApiAdapter ..|> TripProvider
-NsApiAdapter ..|> TripProvider
-
-LoginService --> AuthProvider
-WireMockAuthAdapter ..|> AuthProvider
-Auth0Adapter ..|> AuthProvider
-
-LoginController --> LoginService
 PaymentController --> PaymentService
-TripController --> TripService
 
-LoginService --> UserRepository
-TripService --> TripRepository
+
 PaymentService --> PaymentRepository
 
-UserRepository --> User
 TripRepository --> Trip
 PaymentRepository --> Payment
 
