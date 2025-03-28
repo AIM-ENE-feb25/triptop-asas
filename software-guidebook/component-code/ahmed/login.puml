@@ -1,0 +1,53 @@
+@startuml
+skinparam rankdir TB
+title Login Component Class Diagram
+
+class LoginController <<Controller>> {
+    - LoginServicePort loginService
+    --
+    + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+}
+
+class LoginService <<Service>> {
+    + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+    + handleFallbackScenario() ' optioneel, indien je een fallback wilt afhandelen
+}
+
+class AuthenticationException <<Exception>>
+
+interface IdentityProviderAdapter <<Port>> {
+    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
+}
+
+class WireMockProvider <<Adapter>> {
+    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
+}
+class GoogleAuthProvider <<Adapter>> {
+    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
+}
+
+interface LoginRepo <<Port>> {
+    + Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
+}
+
+class LoginRepoImpl <<Repository>> {
+    + Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
+}
+
+class Reiziger <<Entity>> {
+    - String username
+    - String password
+}
+
+LoginController --> LoginService : uses
+
+LoginService --> AuthenticationException : «throws»
+
+LoginService --> IdentityProviderAdapter : «uses»
+IdentityProviderAdapter <|.. WireMockProvider : «implements»
+IdentityProviderAdapter <|.. GoogleAuthProvider : «implements»
+
+LoginService --> LoginRepo : «uses»
+LoginRepo <|.. LoginRepoImpl : «implements»
+
+@enduml

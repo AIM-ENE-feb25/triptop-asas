@@ -1,0 +1,36 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title Component Diagram – TripTop Backend
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+
+System_Boundary(backendSystem, "Backend", "Java, Spring Boot", "Beheert de businesslogica van TripTop") {
+    Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+    Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+    Component(loginPort, "Login Port", "Interface", "Definieert het contract voor externe authenticatie")
+    Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
+
+    ' Aparte adapter componenten voor de externe authenticatieproviders
+    Component(wiremockAdapter, "WireMock Adapter", "Adapter Pattern", "Implementeert Login Port voor de WireMock API")
+    Component(googleAuthAdapter, "Google Auth Adapter", "Adapter Pattern", "Implementeert Login Port voor de Google Auth API")
+
+    Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
+    Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
+    Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
+
+    ' Login Port wordt geïmplementeerd door de adapters
+    Rel(loginPort, wiremockAdapter, "Implementeert", "REST/JSON")
+    Rel(loginPort, googleAuthAdapter, "Implementeert", "REST/JSON")
+}
+
+System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en SSO")
+System_Ext(identity_provider_google, "Google Auth API", "Simuleert centrale identiteitsverificatie en SSO")
+
+Rel(wiremockAdapter, identity_provider, "Verifieert inloggegevens", "REST/JSON")
+Rel(googleAuthAdapter, identity_provider_google, "Verifieert inloggegevens", "REST/JSON")
+
+Container(database, "Database", "MSSQL", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+Rel(userRepository, database, "Voert CRUD-operaties uit", "JDBC/SQL")
+
+Rel(frontend, loginController, "Stuurt inlogverzoeken", "HTTPS")
+@enduml
