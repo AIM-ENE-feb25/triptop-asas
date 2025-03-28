@@ -1,0 +1,40 @@
+@startuml
+title Component Diagram – TripTop Backend
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+
+System_Boundary(backendSystem, "Backend [Java, Spring Boot]") {
+    Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
+    Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
+    Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
+    Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
+
+
+
+}
+
+Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+
+System_Ext(payment_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
+
+
+
+    Rel(frontend, paymentController, "Stuurt betalingsverzoeken", "HTTPS")
+
+    Rel(paymentController, paymentService, "Stuurt betalingsverzoeken", "JSON/HTTP")
+
+    Rel(paymentService, paymentRepository, "Leest/schrijft betalingsdata", "JDBC/SQL")
+    Rel(paymentRepository,database,"Leest/ Schrijft naar")
+
+    Rel(paymentService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
+
+
+    Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
+
+
+
+
+@enduml
