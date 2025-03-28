@@ -1,0 +1,52 @@
+@startuml
+
+package "Controller Layer" {
+    class PaymentController {
+        + processPayment(paymentRequest: PaymentRequest): ResponseEntity
+    }
+}
+
+package "Service Layer" {
+    class PaymentService {
+        + handlePayment(paymentRequest: PaymentRequest): PaymentResponse
+    }
+
+}
+
+package "Repository Layer" {
+    interface PaymentRepository {
+        + save(payment: Payment): void
+    }
+        class PaymentRepositoryImpl implements PaymentRepository {
+                Long id
+                Double amount
+                String status
+            + save(payment: Payment): void
+        }
+}
+
+
+
+package "Adapter Layer" {
+    interface PaymentPort {
+        + processPayment(amount: Double): PaymentResponse
+    }
+    class StripeAdapter implements PaymentPort {
+        + processPayment(amount: Double): PaymentResponse
+    }
+        class PaypalAdapter(Fictief) implements PaymentPort {
+            + processPayment(amount: Double): PaymentResponse
+        }
+
+
+}
+
+PaymentService --> PaymentPort
+PaymentController --> PaymentService
+PaymentService --> PaymentRepository
+
+
+
+PaymentRepository --> Payment
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title Component Diagram – TripTop Betalingsintegratie
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen en te betalen")
+
+System_Boundary(backendSystem, "TripTop Backend [Java, Spring Boot]") {
+    Component(paymentController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
+    
+    Component(paymentService, "Betaling Service", "Spring Service", "Orkestreert betalingsprocessen")
+    Component(tripService, "Trip Service", "Spring Service", "Beheert reisgegevens en prijsinformatie")
+    Component(userService, "Gebruiker Service", "Spring Service", "Beheert gebruikersgegevens")
+    
+    Component(stripeAdapter, "Stripe Adapter", "Implementation", "Specifieke implementatie voor Stripe")
+    Component(paypalAdapter, "PayPal Adapter", "Implementation", "Specifieke implementatie voor PayPal")
+    
+    Component(paymentFactory, "Betaling Factory", "Factory", "Creëert de juiste betalingsadapter")
+    
+    Component(tripRepository, "Trip Repository", "Spring Data JPA", "Slaat tripgegevens op")
+    Component(userRepository, "Gebruiker Repository", "Spring Data JPA", "Slaat gebruikersgegevens op")
+    Component(betalingRepository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
+    
+    Rel(paymentController, paymentService, "Stuurt betalingsverzoeken", "JSON/HTTP")
+    
+    Rel(paymentService, paymentFactory, "Creëert", "Method Call")
+    Rel(paymentFactory, stripeAdapter, "Creëert indien nodig", "Instantiation")
+    Rel(paymentFactory, paypalAdapter, "Creëert indien nodig", "Instantiation")
+    
+    Rel(paymentService, tripService, "Haalt prijsgegevens op", "Method Call")
+    Rel(paymentService, userService, "Haalt klantgegevens op", "Method Call")
+    
+    Rel(tripService, tripRepository, "Leest/schrijft", "JDBC")
+    Rel(userService, userRepository, "Leest/schrijft", "JDBC")
+    Rel(paymentService, betalingRepository, "Leest/schrijft", "JDBC")
+}
+
+System_Ext(stripe_api, "Stripe API", "Verwerkt creditcard betalingen")
+System_Ext(paypal_api, "PayPal API", "Verwerkt PayPal betalingen")
+
+Rel(stripeAdapter, stripe_api, "Communiceert met", "REST/HTTPS")
+Rel(paypalAdapter, paypal_api, "Communiceert met", "REST/HTTPS")
+
+Rel(frontend, paymentController, "Stuurt betalingsverzoeken", "HTTPS")
+
+Container(database, "Database", "?", "Slaat applicatiegegevens op")
+
+Rel(tripRepository, database, "Leest/Schrijft naar", "")
+Rel(userRepository, database, "Leest/Schrijft naar", "")
+Rel(betalingRepository, database, "Leest/Schrijft naar", "")
+
+@enduml
