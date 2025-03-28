@@ -17,7 +17,7 @@ package "Repository Layer" {
     interface PaymentRepository {
         + save(payment: Payment): void
     }
-        class PaymentRepositoryImpl {
+        class PaymentRepositoryImpl implements PaymentRepository {
                 Long id
                 Double amount
                 String status
@@ -34,19 +34,16 @@ package "Adapter Layer" {
     class StripeAdapter implements PaymentPort {
         + processPayment(amount: Double): PaymentResponse
     }
+        class PaypalAdapter(Fictief) implements PaymentPort {
+            + processPayment(amount: Double): PaymentResponse
+        }
 
 
 }
 
 PaymentService --> PaymentPort
-StripeAdapter ..|> PaymentPort
-
 PaymentController --> PaymentService
-
-
 PaymentService --> PaymentRepository
-
-PaymentRepositoryImpl ..|> PaymentRepository
 
 
 
