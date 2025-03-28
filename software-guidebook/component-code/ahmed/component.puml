@@ -7,27 +7,25 @@ Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat 
 System_Boundary(backendSystem, "Backend", "Java, Spring Boot", "Beheert de businesslogica van TripTop") {
     Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
     Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
-    Component(loginPort, "Login Port", "Interface", "Definieert het contract voor externe authenticatie")
+    Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
     Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
 
-    ' Aparte adapter componenten voor de externe authenticatieproviders
-    Component(wiremockAdapter, "WireMock Adapter", "Adapter Pattern", "Implementeert Login Port voor de WireMock API")
-    Component(googleAuthAdapter, "Google Auth Adapter", "Adapter Pattern", "Implementeert Login Port voor de Google Auth API")
+    Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
+    Component(wireMockAdapterV2, "WireMock Adapter v2", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v2)")
 
     Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
     Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
     Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
 
-    ' Login Port wordt geïmplementeerd door de adapters
-    Rel(loginPort, wiremockAdapter, "Implementeert", "REST/JSON")
-    Rel(loginPort, googleAuthAdapter, "Implementeert", "REST/JSON")
+    Rel(loginPort, wireMockAdapterV1, "Implementeert (v1)", "REST/JSON")
+    Rel(loginPort, wireMockAdapterV2, "Implementeert (v2)", "REST/JSON")
 }
 
-System_Ext(identity_provider, "WireMock API", "Simuleert centrale identiteitsverificatie en SSO")
-System_Ext(identity_provider_google, "Google Auth API", "Simuleert centrale identiteitsverificatie en SSO")
+System_Ext(identity_provider, "WireMock API (v1)", "Simuleert centrale identiteitsverificatie en SSO voor v1")
+System_Ext(identity_provider_v2, "WireMock API (v2)", "Simuleert centrale identiteitsverificatie en SSO voor v2")
 
-Rel(wiremockAdapter, identity_provider, "Verifieert inloggegevens", "REST/JSON")
-Rel(googleAuthAdapter, identity_provider_google, "Verifieert inloggegevens", "REST/JSON")
+Rel(wireMockAdapterV1, identity_provider, "Verifieert inloggegevens", "REST/JSON")
+Rel(wireMockAdapterV2, identity_provider_v2, "Verifieert inloggegevens", "REST/JSON")
 
 Container(database, "Database", "MSSQL", "Slaat reizen, bouwstenen en gebruikersgegevens op")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "JDBC/SQL")

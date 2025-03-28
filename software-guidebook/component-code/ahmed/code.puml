@@ -3,26 +3,29 @@ skinparam rankdir TB
 title Login Component Class Diagram
 
 class LoginController <<Controller>> {
-    - LoginServicePort loginService
+    - LoginService loginService
     --
     + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
 }
 
 class LoginService <<Service>> {
     + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
-    + handleFallbackScenario() ' optioneel, indien je een fallback wilt afhandelen
+    + handleFallbackScenario() ' optioneel
+    - LoginPort loginPort
+    - LoginRepo loginRepo
 }
 
 class AuthenticationException <<Exception>>
 
-interface IdentityProviderAdapter <<Port>> {
+interface LoginPort <<Port>> {
     + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
 }
 
-class WireMockProvider <<Adapter>> {
+class WireMockAdapterV1 <<Adapter>> {
     + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
 }
-class GoogleAuthProvider <<Adapter>> {
+
+class WireMockAdapterV2 <<Adapter>> {
     + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
 }
 
@@ -40,14 +43,11 @@ class Reiziger <<Entity>> {
 }
 
 LoginController --> LoginService : uses
-
 LoginService --> AuthenticationException : «throws»
-
-LoginService --> IdentityProviderAdapter : «uses»
-IdentityProviderAdapter <|.. WireMockProvider : «implements»
-IdentityProviderAdapter <|.. GoogleAuthProvider : «implements»
-
-LoginService --> LoginRepo : «uses»
+LoginService --> LoginPort : uses
+LoginPort <|.. WireMockAdapterV1 : «implements»
+LoginPort <|.. WireMockAdapterV2 : «implements»
+LoginService --> LoginRepo : uses
 LoginRepo <|.. LoginRepoImpl : «implements»
 
 @enduml
