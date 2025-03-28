@@ -1,0 +1,91 @@
+@startuml
+title Class Diagram – TripTop Betalingsintegratie
+
+interface BetalingAdapter {
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +BetalingsStatus controleerStatus(String betalingId)
+}
+
+class StripeAdapter {
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +BetalingsStatus controleerStatus(String betalingId)
+}
+
+class PayPalAdapter {
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +BetalingsStatus controleerStatus(String betalingId)
+}
+
+class BetalingFactory {
+    +BetalingAdapter createAdapter(BetalingsMethode methode)
+}
+
+interface BetalingService {
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +Betaling haalBetalingOp(String betalingId)
+}
+
+class BetalingServiceImpl {
+    -BetalingRepository repository
+    -BetalingFactory factory
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +Betaling haalBetalingOp(String betalingId)
+}
+
+class BetalingController {
+    -BetalingService service
+    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
+    +Betaling haalBetalingOp(String betalingId)
+}
+
+class BetalingsVerzoek {
+    -String reserveringId
+    -BigDecimal bedrag
+    -BetalingsMethode methode
+}
+
+class BetalingsResultaat {
+    -String betalingId
+    -BetalingsStatus status
+    -String redirectUrl
+}
+
+class Betaling {
+    -String betalingId
+    -String reserveringId
+    -BigDecimal bedrag
+    -BetalingsStatus status
+    -BetalingsMethode methode
+    -LocalDateTime tijdstempel
+}
+
+enum BetalingsMethode {
+    STRIPE
+    PAYPAL
+}
+
+enum BetalingsStatus {
+    GESTART
+    VOLTOOID
+    MISLUKT
+}
+
+class BetalingsException {
+}
+
+BetalingController --> BetalingService: "gebruikt"
+BetalingServiceImpl ..|> BetalingService: "implementeert"
+BetalingServiceImpl --> BetalingFactory: "gebruikt"
+BetalingFactory --> BetalingAdapter: "creëert"
+StripeAdapter ..|> BetalingAdapter: "implementeert"
+PayPalAdapter ..|> BetalingAdapter: "implementeert"
+BetalingServiceImpl --> BetalingsException: "gooit"
+BetalingServiceImpl --> BetalingsVerzoek: "verwerkt"
+BetalingServiceImpl --> BetalingsResultaat: "retourneert"
+BetalingServiceImpl --> Betaling: "beheert"
+BetalingsVerzoek --> BetalingsMethode: "gebruikt"
+BetalingsResultaat --> BetalingsStatus: "bevat"
+Betaling --> BetalingsMethode: "bevat"
+Betaling --> BetalingsStatus: "bevat"
+
+@enduml
