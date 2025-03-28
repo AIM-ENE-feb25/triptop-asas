@@ -1,4 +1,11 @@
 
+### Ontwerpvraag
+Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een
+grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat
+een wijziging in de API van een externe service niet leidt tot een
+wijziging in de front-end maar flexibel kan worden opgevangen door de
+back-end?
+
 ### Design Pattern en Principe Keuze
 
 Voor mijn design pattern keuze heb ik gekozen voor het Adapter Pattern. Dit pattern maakt het mogelijk om de communicatie met externe authenticatieproviders op een uniforme en uitbreidbare wijze te organiseren. In dit geval integreer ik met de WireMock API, waarbij ik twee versies onderhoud (WireMock Adapter v1 en v2). Dankzij het Adapter Pattern kan de Login Service eenvoudig overschakelen tussen verschillende adapter-implementaties of nieuwe versies toevoegen zonder de bestaande code te wijzigen. Dit sluit naadloos aan bij het Open/Closed Principe, omdat het systeem open is voor uitbreiding maar gesloten voor modificatie.
@@ -8,6 +15,9 @@ Daarnaast pas ik het Single Responsibility Principe toe, wat betekent dat elke k
 Door meerdere versies van de WireMock Adapter te behouden, kan ik bestaande functionaliteit ondersteunen terwijl ik nieuwe versies geleidelijk implementeer. Hierdoor blijft de front-end stabiel, zelfs als de externe API verandert.
 
 ---
+
+
+
 ### COMPONENT DIAGRAM
 
 ![Component Diagram](component-Component_Diagram___TripTop_Backend.png)
