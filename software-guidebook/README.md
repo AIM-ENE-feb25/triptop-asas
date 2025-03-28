@@ -297,6 +297,17 @@ Voor het TripTop-systeem is overwogen een API gateway te implementeren als tusse
 #### Beslissing
 Wij kiezen ervoor **geen API Gateway** te implementeren. Onze backend communiceert direct met externe services via REST API’s, wat leidt tot een eenvoudigere architectuur en snellere ontwikkeling.
 
+#### Bronnen
+
+- Venturelli, I. (2024, December 6). Choosing the right Java microservices framework: Spring Boot, Quarkus, Micronaut, and beyond. Medium. https://medium.com/codex/choosing-the-right-java-microservices-framework-spring-boot-quarkus-micronaut-and-beyond-e53f11704e58
+
+- Chmielarz, M. (2025, March 24). Overview of next-generation Java frameworks. SoftwareMill. https://softwaremill.com/overview-of-next-generation-java-frameworks/
+
+- Dansiviter. (2021, June 27). Opinionated take on Java Microservices Frameworks. DEV Community. https://dev.to/dansiviter/opinionated-take-on-java-microservices-frameworks-4ebh
+
+
+#### Besluit
+
 #### Consequenties
 - **Lagere kosten & eenvoudiger beheer:** Minder componenten om te onderhouden.
 - **Snellere responstijden:** Directe communicatie met externe services.
