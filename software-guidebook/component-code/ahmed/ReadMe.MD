@@ -29,10 +29,12 @@ De oude versie, in dit geval WireMock Adapter v1, wordt behouden zodat bestaande
 ---
 
 ### CODE DIAGRAM
-![Component Diagram](login-Login_Component_Class_Diagram.png)
+![Code Diagram](login-Login_Component_Class_Diagram.png)
 
     
 ---
+### DYNAMIC DIAGRAM
+![Dynamic Diagram](dynamic-Dynamic_Diagram.png)
 
 
 
