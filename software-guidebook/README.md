@@ -297,6 +297,13 @@ Voor het TripTop-systeem is overwogen een API gateway te implementeren als tusse
 #### Beslissing
 Wij kiezen ervoor **geen API Gateway** te implementeren. Onze backend communiceert direct met externe services via REST API’s, wat leidt tot een eenvoudigere architectuur en snellere ontwikkeling.
 
+
+#### Consequenties
+- **Lagere kosten & eenvoudiger beheer:** Minder componenten om te onderhouden.
+- **Snellere responstijden:** Directe communicatie met externe services.
+- **Geen centrale plek voor cross-cutting concerns:** Zaken zoals rate limiting en monitoring moeten elders worden opgevangen.
+- **Schaalbaarheid:** Mogelijke uitdagingen bij toekomstige groei, maar voor de huidige schaal past de directe aanpak het best.
+
 #### Bronnen
 
 - Venturelli, I. (2024, December 6). Choosing the right Java microservices framework: Spring Boot, Quarkus, Micronaut, and beyond. Medium. https://medium.com/codex/choosing-the-right-java-microservices-framework-spring-boot-quarkus-micronaut-and-beyond-e53f11704e58
@@ -304,15 +311,6 @@ Wij kiezen ervoor **geen API Gateway** te implementeren. Onze backend communicee
 - Chmielarz, M. (2025, March 24). Overview of next-generation Java frameworks. SoftwareMill. https://softwaremill.com/overview-of-next-generation-java-frameworks/
 
 - Dansiviter. (2021, June 27). Opinionated take on Java Microservices Frameworks. DEV Community. https://dev.to/dansiviter/opinionated-take-on-java-microservices-frameworks-4ebh
-
-
-#### Besluit
-
-#### Consequenties
-- **Lagere kosten & eenvoudiger beheer:** Minder componenten om te onderhouden.
-- **Snellere responstijden:** Directe communicatie met externe services.
-- **Geen centrale plek voor cross-cutting concerns:** Zaken zoals rate limiting en monitoring moeten elders worden opgevangen.
-- **Schaalbaarheid:** Mogelijke uitdagingen bij toekomstige groei, maar voor de huidige schaal past de directe aanpak het best.
 
 ---
 
@@ -360,6 +358,47 @@ Wij kiezen voor **MSSQL** als onze primaire database-oplossing voor Triptop. Dez
 - **Licentiekosten:** Geen bijkomende kosten dankzij gratis gebruik, wat de totale investering verlaagt.
 - **Ecosysteem:** MSSQL biedt een stabiel en uitgebreid ecosysteem met ondersteuning vanuit Microsoft.
 
+
+### ADR-006  Keuze voor design pattern
+
+#### Status
+Geaccepteerd
+
+#### Context
+
+Het is belangrijk om een wel overwogen keuze te maken over welk design pattern wordt gebruikt om de data vanuit een extern systeem (Booking.com) en data vanuit een intern systeem (TripTopService) te combineren en op te slaan.
+
+
+#### Overwogen Opties
+
+| **Criteria**                  | **State Pattern** | **Strategy Pattern** | **Adapter Pattern** | **Facade Pattern** | **Factory Method Pattern** |
+|--------------------------------|-------------------|----------------------|---------------------|--------------------|----------------------------|
+| **Mate van afhankelijkheid**   | -                 | -                    | +                   | +                  | -                          |
+| **Loskoppeling**               | +                 | ++                   | +                   | ++                 | ++                         | 
+| **Uitbreidbaarheid**           | ++                | +                    | -                   | -                  | ++                         |
+| **Integratie met meerdere klassen** | +          | +                    | ++                  | ++                 | +                          |
+
+- Adapter Pattern: Dit patroon creëert een tussenlaag die het interne contract (Login Port) vertaalt naar externe API-aanroepen. Hierdoor blijft de interne logica stabiel en is de applicatie makkelijk uitbreidbaar.
+
+Deze design pattern is gebaseerd op de volgende design principles:
+- Single Responsibility Principle
+- Dependency Inversion Principle
+
+#### Consequenties
+
+Voordelen
+Het facade pattern zorgt ervoor dat het systeem data vanuit een extern systeem(Booking.com) en data vanuit een intern systeem (TripTopService) kan combineren en dit kan opslaan.
+
+
+Nadelen
+Het is mogelijk dat de facade class te groot wordt en dat het moeilijk wordt om de code te onderhouden. Daarnaast is het lastig om nieuwe api's of interne systemen toe te voegen aan de facade class.
+
+
+
+
+
+
+
 ### ADR-007: Gebruik van het Adapter Pattern voor Inloggen
 #### **Status:** Geaccepteerd
 
@@ -404,6 +443,61 @@ Wij kiezen voor het **Adapter Pattern**. Dit patroon stelt ons in staat om een s
 - **Risico's en Nadelen:**
     - Extra complexiteit in de back-end door de introductie van meerdere adapter-implementaties.
     - Mogelijke duplicatie van functionaliteit indien adapters overlappende taken hebben, wat nauwgezet beheer vereist.
+
+### ADR-008: Keuze van Design Pattern - Amine
+
+#### **Status**: Geaccepteerd  
+
+#### Context
+In het backend systeem van de TripTop applicatie willen we externe services zoals boekingen, betalingen, routeplanning en authenticatie integreren. Deze externe services bieden verschillende interfaces en protocollen die niet direct overeenkomen met de interne architectuur van ons systeem. Om deze externe services op een uniforme manier te kunnen aanroepen, moeten we een design pattern kiezen dat het mogelijk maakt om deze variëteiten van interfaces aan te passen aan onze interne vereisten.
+
+#### Overwogen opties (Beslissingsfactoren)
+
+- **State Pattern**: Dit patroon is ontworpen om de toestand van een object te beheren en zou complexer zijn dan nodig voor onze situatie, aangezien we geen toestandsbeheer nodig hebben voor de integratie van externe systemen.
+
+- **Strategy Pattern**: Dit patroon is geschikt voor het variëren van algoritmes binnen een context, maar biedt geen oplossing voor het aanpassen van interfaces van externe systemen. Het is dus niet direct van toepassing op onze integratiebehoefte.
+
+- **Adapter Pattern**: Dit patroon biedt een uitstekende oplossing voor het aanpassen van verschillende interfaces van externe systemen naar de interne vereisten van ons systeem. Het maakt het mogelijk om een enkele, uniforme interface voor alle externe communicatie te creëren, zonder dat we de externe systemen zelf hoeven aan te passen.
+
+- **Facade Pattern**: Het Facade Pattern biedt een vereenvoudigde interface voor een groep subsystemen, maar maakt geen aanpassingen aan de interne interfaces. Dit zou een oplossing kunnen zijn als we alle integraties via één vereenvoudigde API willen aanbieden, maar we moeten nog steeds met verschillende interfaces werken die aangepast moeten worden.
+
+- **Factory Method Pattern**: Dit patroon is gericht op het creëren van objecten via een centrale methode, wat handig is voor objectcreatie maar niet geschikt is voor het aanpassen van interfaces.
+
+#### Beslissing
+Het **Adapter Pattern** is het beste patroon voor deze situatie. Dit patroon biedt een flexibele manier om de verschillende externe systemen die TripTop moet integreren te verbinden met de interne architectuur. Het maakt het mogelijk om een enkele, uniforme interface voor alle externe communicatie te creëren, zonder dat we de externe systemen zelf hoeven te wijzigen.
+
+Door adapters te gebruiken, kunnen we ervoor zorgen dat de verschillende externe systemen, zoals de betaling- en boekingssystemen, compatibel zijn met onze interne services zonder dat we de externe systemen zelf hoeven aan te passen. Dit levert een schaalbare oplossing op die eenvoudig uitbreidbaar is voor nieuwe externe integraties in de toekomst.
+
+#### Consequenties
+Voordelen
+
+1. **Flexibiliteit in integratie**: Het Adapter Pattern maakt het mogelijk om verschillende externe systemen met verschillende interfaces te integreren zonder de externe systemen zelf te hoeven aanpassen.
+
+2. **Uniforme interface**: Externe systemen worden aangepast naar een uniforme interne interface, wat de communicatie vereenvoudigt en de interne code consistent houdt.
+
+3. **Schaalbaarheid**: Nieuwe externe systemen kunnen eenvoudig worden toegevoegd door simpelweg nieuwe adapters te implementeren, zonder dat de bestaande architectuur aangepast hoeft te worden.
+
+4. **Eenvoudig testen**: De adapters kunnen afzonderlijk worden getest, wat het testen van de integratie met externe systemen eenvoudiger maakt.
+
+5. **Beheer van complexiteit**: Het gebruik van adapters helpt om de complexiteit van externe systeemintegraties in beheersbare lagen te verdelen, wat het makkelijker maakt om wijzigingen door te voeren zonder grote impact op de rest van het systeem.
+
+Nadelen
+
+1. **Extra code en complexiteit**: Het toevoegen van adapters voegt extra klassen toe aan het systeem, wat kan leiden tot meer code en mogelijk meer complexiteit in het onderhoud.
+
+2. **Verhoogd aantal klassen**: Voor elke externe service moet een aparte adapter worden gemaakt, wat kan leiden tot een groot aantal klassen als het aantal externe integraties toeneemt.
+
+3. **Prestaties**: Het gebruik van adapters kan een kleine prestatiedaling veroorzaken vanwege de extra laag van abstractie die wordt toegevoegd voor het aanpassen van interfaces.
+
+4. **Moeilijkheden bij grote veranderingen**: Als externe systemen regelmatig hun interfaces wijzigen, kan het onderhouden van de adapters extra werk vereisen om de compatibiliteit te behouden.
+
+5. **Afhankelijkheid van adapters**: Als adapters slecht zijn geïmplementeerd of niet goed worden onderhouden, kunnen ze de communicatie met de externe systemen verstoren, wat tot moeilijkheden kan leiden bij het oplossen van integratieproblemen.
+
+
+Gevolgen
+- Er zullen extra klassen nodig zijn die de externe systemen adapteren naar een interne interface.
+- Elke nieuwe externe service zal een aparte adapter vereisen.
+- De adapters kunnen eenvoudiger worden getest, omdat ze een afzonderlijke laag vormen die de communicatie tussen ons systeem en de externe systemen afhandelt.
 
 
 
