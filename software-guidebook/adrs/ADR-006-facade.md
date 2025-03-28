@@ -1,4 +1,4 @@
-### 8.5. ADR-006  Keuze voor waar implementatie interface
+### 8.5. ADR-006  Keuze voor design pattern
 
 #### Status
 Geaccepteerd
