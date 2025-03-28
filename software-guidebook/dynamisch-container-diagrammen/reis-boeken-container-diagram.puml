@@ -6,7 +6,7 @@ Person(user, "Reiziger", "Gebruiker die een reis plant met vervoer met een huura
 System_Boundary(triptop, "TripTop") {
     Container(frontend, "Frontend", "React", "UI waar de gebruiker de reis selecteert en boekt")
     Container(backend, "Backend", "Java, Spring Boot", "Beheert reisobjecten, vraagt route op, boekt de huurauto en verwerkt betalingen")
-    ContainerDb(db, "Database", "SQL", "Slaat trips, reserveringen en betalingsgegevens op")
+    ContainerDb(db, "Database", "MSSQL", "Slaat trips, reserveringen en betalingsgegevens op")
     }
 System_Ext(mapsApi, "Maps API", "Berekent de route tussen vertrek- en bestemmingslocatie")
 System_Ext(autohuurApi, "Booking API", "Boekt de huurauto voor de reis")

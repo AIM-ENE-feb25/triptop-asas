@@ -7,7 +7,7 @@ Person(user, "Gebruiker (Reiziger)", "Wilt inloggen op TripTop")
 System_Boundary(triptop, "TripTop") {
 Container(frontend, "Frontend", "React", "UI waar de gebruiker inlogt")
 Container(backend, "Backend", "Java, Spring Boot", "Behandelt inlogverzoeken en authenticatie")
-ContainerDb(db, "Database", "SQL", "Slaat gebruikers- en reisgegevens op")
+ContainerDb(db, "Database", "MSSQL", "Slaat gebruikers- en reisgegevens op")
 }
 System_Ext(identity, "WireMock API", "Simuleert centrale identiteitsverificatie en Single Sign-On voor testdoeleinden")
 
