@@ -1,0 +1,33 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+title Dynamic Diagram – Login Process (C4)
+
+Person(reiziger, "Reiziger", "Reiziger die inlogt")
+Container(frontend, "Frontend", "React, JavaScript", "Gebruiker die inlogt")
+
+System_Boundary(backendSystem, "Backend", "Java, Spring Boot") {
+  Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+  Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+  Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+  Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
+
+  Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
+}
+
+Container_Ext(identityProvider, "WireMock API (v1)", "Simuleert centrale identiteitsverificatie en SSO voor v1")
+
+Rel(reiziger, frontend, "Stuurt inlogverzoeken", "HTTPS")
+Rel(frontend, loginController, "Stuurt inlogverzoeken", "HTTPS")
+Rel(loginController, loginService, "Verwerkt inlogverzoeken", "JSON/HTTP")
+Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
+Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
+Rel(loginPort, wireMockAdapterV1, "Implementeert (v1)", "REST/JSON")
+Rel(wireMockAdapterV1, identityProvider, "Verifieert inloggegevens", "REST/JSON")
+
+Rel(identityProvider, wireMockAdapterV1, "Retourneert AuthToken", "REST/JSON")
+Rel(wireMockAdapterV1, loginPort, "Retourneert AuthToken", "REST/JSON")
+Rel(loginPort, loginService, "Retourneert AuthToken", "REST/JSON")
+Rel(loginService, loginController, "Retourneert AuthToken", "JSON/HTTP")
+Rel(loginController, frontend, "Retourneert AuthToken", "HTTPS")
+Rel(frontend, reiziger, "Retourneert AuthToken", "HTTPS")
+@enduml

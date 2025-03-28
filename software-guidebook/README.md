@@ -159,6 +159,7 @@ Toelichting
 
 ###     7.2. Components
 
+[Ahmed Component & Code](component-code/ahmed/ReadMe.MD)
 > [!IMPORTANT]
 > Voeg toe: Component Diagram plus een Dynamic Diagram van een aantal scenario's inclusief begeleidende tekst.
 
