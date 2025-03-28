@@ -14,11 +14,13 @@ class Boeking {
 class BoekingController {
     - BoekingService boekingService
     + getBoekingen(): List<Boeking>
+    + setBoekingen(): List<Boeking>
 }
 
 class BoekingService {
     - BoekingRepository boekingRepository
     + getBoekingen(): List<Boeking>
+    + setBoekingen(): List<Boeking>
     - FacadeService facadeService
 
 }
@@ -31,7 +33,9 @@ class BoekingRepository {
 class FacadeService {
     - BookingComAdapter bookingComAdapter
     - TripTopService tripTopService
-     - getBoekingen(): List<Boeking>
+    - getBoekingen(): List<Boeking>
+    - getExterneBoekingen(): List<Boeking>
+    - getInterneBoekingen(): List<Boeking>
 }
 
 class BookingComAdapter {
@@ -43,14 +47,14 @@ class TripTopService {
 }
 
 interface BoekingInterface {
-    - getBoekingen(): List<Boeking>
+    - getExterneBoekingen(): List<Boeking>
+    - getInterneBoekingen(): List<Boeking>
 }
 
 BoekingController --> BoekingService: "gebruikt"
 BoekingService --> FacadeService: "gebruikt"
 BoekingService --> BoekingRepository: "gebruikt"
-BookingComAdapter --> BoekingInterface: "implementeert"
-TripTopService --> BoekingInterface: "implementeert"
+FacadeService --> BoekingInterface: "implementeert"
 FacadeService  --> BookingComAdapter : "gebruikt"
 FacadeService --> TripTopService : "gebruikt"
 
