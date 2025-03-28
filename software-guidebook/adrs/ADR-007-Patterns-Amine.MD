@@ -23,6 +23,31 @@ Het **Adapter Pattern** is het beste patroon voor deze situatie. Dit patroon bie
 
 Door adapters te gebruiken, kunnen we ervoor zorgen dat de verschillende externe systemen, zoals de betaling- en boekingssystemen, compatibel zijn met onze interne services zonder dat we de externe systemen zelf hoeven aan te passen. Dit levert een schaalbare oplossing op die eenvoudig uitbreidbaar is voor nieuwe externe integraties in de toekomst.
 
+## Voordelen
+
+1. **Flexibiliteit in integratie**: Het Adapter Pattern maakt het mogelijk om verschillende externe systemen met verschillende interfaces te integreren zonder de externe systemen zelf te hoeven aanpassen.
+
+2. **Uniforme interface**: Externe systemen worden aangepast naar een uniforme interne interface, wat de communicatie vereenvoudigt en de interne code consistent houdt.
+
+3. **Schaalbaarheid**: Nieuwe externe systemen kunnen eenvoudig worden toegevoegd door simpelweg nieuwe adapters te implementeren, zonder dat de bestaande architectuur aangepast hoeft te worden.
+
+4. **Eenvoudig testen**: De adapters kunnen afzonderlijk worden getest, wat het testen van de integratie met externe systemen eenvoudiger maakt.
+
+5. **Beheer van complexiteit**: Het gebruik van adapters helpt om de complexiteit van externe systeemintegraties in beheersbare lagen te verdelen, wat het makkelijker maakt om wijzigingen door te voeren zonder grote impact op de rest van het systeem.
+
+## Nadelen
+
+1. **Extra code en complexiteit**: Het toevoegen van adapters voegt extra klassen toe aan het systeem, wat kan leiden tot meer code en mogelijk meer complexiteit in het onderhoud.
+
+2. **Verhoogd aantal klassen**: Voor elke externe service moet een aparte adapter worden gemaakt, wat kan leiden tot een groot aantal klassen als het aantal externe integraties toeneemt.
+
+3. **Prestaties**: Het gebruik van adapters kan een kleine prestatiedaling veroorzaken vanwege de extra laag van abstractie die wordt toegevoegd voor het aanpassen van interfaces.
+
+4. **Moeilijkheden bij grote veranderingen**: Als externe systemen regelmatig hun interfaces wijzigen, kan het onderhouden van de adapters extra werk vereisen om de compatibiliteit te behouden.
+
+5. **Afhankelijkheid van adapters**: Als adapters slecht zijn geïmplementeerd of niet goed worden onderhouden, kunnen ze de communicatie met de externe systemen verstoren, wat tot moeilijkheden kan leiden bij het oplossen van integratieproblemen.
+
+
 ## Gevolgen
 - Er zullen extra klassen nodig zijn die de externe systemen adapteren naar een interne interface.
 - Elke nieuwe externe service zal een aparte adapter vereisen.
