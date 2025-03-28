@@ -5,18 +5,22 @@ title Component Diagram – TripTop Backend
 Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
 
 System_Boundary(backendSystem, "Backend [Java, Spring Boot]") {
-    Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
-    Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
-    Component(tripController, "Trip Controller", "Spring MVC", "Verwerkt reisplanningsverzoeken")
+    Component(loginController, "Login Controller", "Spring MVC", "Verwerkt login")
+    Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
+    Component(tripController, "Trip Controller", "Spring MVC", "Verwerkt reisplanningen")
 
-    Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
-    Component(paymentService, "Payment Service", "Spring Service", "Behandelt betalingsverwerking")
-    Component(tripService, "Trip Service", "Spring Service", "Beheert reisplanning en -informatie")
+    Component(loginService, "Login Service", "Spring Service", "Doet de businesslogica van de authenticatie en autorisatie")
+    Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
+    Component(tripService, "Trip Service", "Spring Service", "Doet de businesslogica van de reisplanning en -informatie")
 
-    Component(userRepository, "User Repository", "Spring Data JPA", "Slaat gebruikersgegevens op")
-    Component(tripRepository, "Trip Repository", "Spring Data JPA", "Slaat complete trip-aggregaten op (inclusief boekingen)")
-    Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op")
+    Component(userRepository, "User Repository", "Spring Data JPA", "Slaat gebruikersgegevens op in de database")
+    Component(tripRepository, "Trip Repository", "Spring Data JPA", "Slaat complete trips op (inclusief boekingen) in de database")
+    Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
 
+
+    Component(tripAdapter, "Trip Service Adapter", "Spring Boot", "Abstracteert externe reis- en boekingsservices")
+    Component(authAdapter, "Auth Service Adapter", "Spring Boot", "Abstracteert externe authenticatiediensten")
+    Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
 
 
 
@@ -55,6 +59,19 @@ System_Ext(eten_services, "UberEats API", "Biedt een overzicht van restaurants, 
     Rel(tripService, tripRepository, "Leest/schrijft tripdata", "JDBC/SQL")
     Rel(paymentService, paymentRepository, "Leest/schrijft betalingsdata", "JDBC/SQL")
     Rel(paymentRepository,database,"Leest/ Schrijft naar")
+
+    Rel(tripService, tripAdapter, "Haalt reis- en boekingsinformatie op", "REST/JSON")
+    Rel(loginService, authAdapter, "Haalt gebruikersgegevens op", "REST/JSON")
+    Rel(paymentService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
+
+    Rel(tripAdapter, booking, "Haalt boekingsmogelijkheden op en boekt", "REST/JSON")
+    Rel(authAdapter, identity_provider, "Authenticeert gebruikers", "REST/JSON")
+    Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
+    Rel(tripAdapter, vervoer_services, "Haalt reisinformatie (trein) op", "REST/JSON")
+    Rel(tripAdapter, routeplanner_service, "Haalt routes op", "REST/JSON")
+    Rel(tripAdapter, activiteiten_services, "Haalt activiteiten/excursies op", "REST/JSON")
+    Rel(tripAdapter, eten_services, "Haalt eet-/drinkmogelijkheden op", "REST/JSON")
+
 
 
 
