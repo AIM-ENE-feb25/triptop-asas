@@ -3,7 +3,7 @@ title Class Diagram – Boeking Hoe kunnen verschillende boekingsservices (zoals
 
 class Boeking {
     -Int boekingId
-    - Int reizigerId
+    -Int reizigerId
     -Date boekingsDatum
     -Date vertrekDatum
     -Date aankomstDatum
@@ -23,30 +23,36 @@ class BoekingService {
 
 }
 
-class BoekingRepository {}
+class BoekingRepository {
+    + setBoekingen()
+}
+
 
 class FacadeService {
-
+    - BookingComAdapter bookingComAdapter
+    - TripTopService tripTopService
+     - getBoekingen(): List<Boeking>
 }
 
 class BookingComAdapter {
-
+    - getBoekingen()
 }
 
 class TripTopService {
-
+    - getBoekingen()
 }
 
-interface BoekingInterface {}
-
+interface BoekingInterface {
+    - getBoekingen(): List<Boeking>
+}
 
 BoekingController --> BoekingService: "gebruikt"
 BoekingService --> FacadeService: "gebruikt"
 BoekingService --> BoekingRepository: "gebruikt"
-FacadeService --|> BoekingInterface : "implementeert"
+BookingComAdapter --> BoekingInterface: "implementeert"
+TripTopService --> BoekingInterface: "implementeert"
 FacadeService  --> BookingComAdapter : "gebruikt"
 FacadeService --> TripTopService : "gebruikt"
-
 
 
 @enduml
