@@ -1,0 +1,57 @@
+@startuml
+title Class Diagram – Boeking Hoe kunnen verschillende boekingsservices (zoals Booking.com en eigen beheer in Triptop) worden geïntegreerd?
+
+class Boeking {
+    -Int boekingId
+    -Int reizigerId
+    -Date boekingsDatum
+    -Date vertrekDatum
+    -Date aankomstDatum
+    -String vertrekLocatie
+    -String aankomstLocatie
+    -Double prijs
+}
+class BoekingController {
+    - BoekingService boekingService
+    + haalOvernachtingenOp(): List<Boeking>
+    + slaBoekingenOp(): List<Boeking>
+}
+
+
+class BoekingRepository {
+    + slaBoekingenOp()
+}
+
+
+class FacadeService {
+    - BoekingRepository boekingRepository
+    - BookingComAdapter bookingComAdapter
+    - TripTopService tripTopService
+    - haalOvernachtingenOp(): List<Boeking>
+    - slaBoekingenOp(): List<Boeking>
+    - haalExterneOvernachtingenOp(): List<Boeking>
+    - haalInterneOvernachtingenOp(): List<Boeking>
+}
+
+class BookingComAdapter {
+    - haalOvernachtingenOp()
+}
+
+class TripTopService {
+    - haalOvernachtingenOp()
+}
+
+interface BoekingInterface {
+    # haalExterneBoekingenOp(): List<Boeking>
+    # haalInterneBoekingenOp(): List<Boeking>
+}
+
+BoekingController --> FacadeService: "gebruikt"
+BoekingController --> Boeking: "gebruikt"
+FacadeService --> BoekingRepository: "gebruikt"
+FacadeService --> BoekingInterface: "implementeert"
+FacadeService  --> BookingComAdapter : "gebruikt"
+FacadeService --> TripTopService : "gebruikt"
+
+
+@enduml
