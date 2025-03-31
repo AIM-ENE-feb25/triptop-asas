@@ -1,5 +1,5 @@
 @startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
 title Component diagram van TripTop voor het TripTop systeem
 
@@ -16,7 +16,7 @@ Container_Boundary(triptop, "Boeking Systeem") {
 }
 
  Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
- ContainerDb(database, "Database", "MSSQL", "Opslag van boekingen")
+ Container(database, "Database", "MSSQL", "Opslag van boekingen")
 
 System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accommodaties,boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
 

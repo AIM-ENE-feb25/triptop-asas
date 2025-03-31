@@ -1,0 +1,8 @@
+Persoonlijke feedback
+
+Duidelijk aangeven welke bron bij welk deel van de tabel hoort
+Facade en Boeking service samenvoegen met naam BoekingOverzichtFacade
+TripTopService logischere naam geven, bv. InternSysteem.
+Reisagent weghalen in component diagrammen en container tag veranderen naar component
+Class diagram aanpassen op basis van hernieuwde component diagrammen.
+Toelichting schrijven voor diagrammen.
