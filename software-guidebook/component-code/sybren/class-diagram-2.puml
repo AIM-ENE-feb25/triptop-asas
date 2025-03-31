@@ -23,10 +23,10 @@ class BoekingRepository {
 }
 
 
-class FacadeService {
+class BoekingOverzichtService {
     - BoekingRepository boekingRepository
     - BookingComAdapter bookingComAdapter
-    - TripTopService tripTopService
+    - InternBoekingSysteem tripTopService
     - haalOvernachtingenOp(): List<Boeking>
     - slaBoekingenOp(): List<Boeking>
     - haalExterneOvernachtingenOp(): List<Boeking>
@@ -37,7 +37,7 @@ class BookingComAdapter {
     - haalOvernachtingenOp()
 }
 
-class TripTopService {
+class InternBoekingSysteem {
     - haalOvernachtingenOp()
 }
 
@@ -46,12 +46,12 @@ interface BoekingInterface {
     # haalInterneBoekingenOp(): List<Boeking>
 }
 
-BoekingController --> FacadeService: "gebruikt"
+BoekingController --> BoekingOverzichtService: "gebruikt"
 BoekingController --> Boeking: "gebruikt"
-FacadeService --> BoekingRepository: "gebruikt"
-FacadeService --> BoekingInterface: "implementeert"
-FacadeService  --> BookingComAdapter : "gebruikt"
-FacadeService --> TripTopService : "gebruikt"
+BoekingOverzichtService --> BoekingRepository: "gebruikt"
+BoekingOverzichtService --> BoekingInterface: "implementeert"
+BoekingOverzichtService  --> BookingComAdapter : "gebruikt"
+BoekingOverzichtService --> InternBoekingSysteem : "gebruikt"
 
 
 @enduml
