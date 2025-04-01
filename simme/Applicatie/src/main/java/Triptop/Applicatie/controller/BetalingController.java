@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import Triptop.Applicatie.dto.betaling.BetalingsResultaat;
 import Triptop.Applicatie.dto.betaling.BetalingsVerzoek;
+import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
+import Triptop.Applicatie.model.Betaling;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import Triptop.Applicatie.model.betaling.Betaling;
 import Triptop.Applicatie.service.BetalingService;
 
 @RestController
@@ -27,7 +28,7 @@ public class BetalingController {
     }
 
     @GetMapping("/status")
-    public Betaling controleerStatus(@RequestParam String betalingId) {
+    public DetailedBetalingStatus controleerStatus(@RequestParam String betalingId) {
         return betalingService.haalBetalingOp(betalingId);
     }
 }
