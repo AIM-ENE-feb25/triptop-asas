@@ -1,6 +1,6 @@
 package Triptop.Applicatie.dto.betaling;
 
-import Triptop.Applicatie.model.betaling.BetalingsMethode;
+import Triptop.Applicatie.model.BetalingsMethode;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,6 @@
 package Triptop.Applicatie.dto.betaling;
 
-import Triptop.Applicatie.model.betaling.BetalingsStatus;
-
+import Triptop.Applicatie.model.BetalingsStatus;
 import lombok.Data;
 
 @Data
