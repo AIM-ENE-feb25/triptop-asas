@@ -2,6 +2,9 @@ package Triptop.Applicatie.model.betaling;
 
 import java.time.LocalDateTime;
 
+import lombok.Data;
+
+@Data
 public class Betaling {
     private String betalingId;
     private String reserveringId;
@@ -10,4 +13,3 @@ public class Betaling {
     private BetalingsMethode methode;
     private LocalDateTime tijdstempel;
 }
-
