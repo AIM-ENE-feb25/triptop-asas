@@ -9,10 +9,11 @@ public class BetalingFactory {
     public BetalingAdapter createBetalingAdapter(BetalingsMethode methode) {
         switch (methode) {
             case STRIPE:
-                return new StripeBetalingAdapter();
+                return new StripeAdapter();
             case PAYPAL:
-                return new PaypalBetalingAdapter();
+                return new PaypalAdapter();
             default:
                 throw new IllegalArgumentException("Ongeldige betalingsmethode: " + methode);
         }
+    }
 }
