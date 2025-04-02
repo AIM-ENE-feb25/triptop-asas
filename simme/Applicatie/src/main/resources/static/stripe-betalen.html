@@ -23,7 +23,7 @@
             color: #333;
             margin-top: 0;
         }
-        #card-element {
+        #payment-element {
             margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #ddd;
@@ -74,8 +74,8 @@
 <body>
     <div id="payment-form">
         <h2>Voltooi uw betaling</h2>
-        <div id="card-element">
-            <!-- Stripe Elements will create form elements here -->
+        <div id="payment-element">
+            <!-- Payment Element will create form elements here -->
         </div>
         <button id="submit-button">Betalen</button>
         <div id="payment-result" style="display: none;"></div>
@@ -91,15 +91,25 @@
             document.getElementById('payment-result').className = 'error';
             document.getElementById('payment-result').style.display = 'block';
             document.getElementById('submit-button').disabled = true;
-            document.getElementById('card-element').style.display = 'none';
+            document.getElementById('payment-element').style.display = 'none';
         } else {
             // Initialize Stripe with your publishable key
             const stripe = Stripe('pk_test_51N4OmtHDpfFA764U7IN5USKT9qenhutpr7Ux6RMkzJXp7pcQEhxIz0QJkDyUhKzdBpDWCtNWTMy5mhpL1TNN6O7D00tcuQADe2');
-            const elements = stripe.elements();
             
-            // Create card Element and mount it
-            const cardElement = elements.create('card');
-            cardElement.mount('#card-element');
+            // Create elements instance with the client secret
+            const elements = stripe.elements({
+                clientSecret: clientSecret,
+                appearance: {
+                    theme: 'stripe',
+                    variables: {
+                        colorPrimary: '#5469d4',
+                    }
+                }
+            });
+            
+            // Create and mount the Payment Element
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
             
             // Handle form submission
             const submitButton = document.getElementById('submit-button');
@@ -111,13 +121,15 @@
                 submitButton.innerHTML = '<span class="loading"></span> Verwerken...';
                 resultDiv.style.display = 'none';
                 
-                const {error, paymentIntent} = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            name: 'Test User'
-                        }
-                    }
+                // Use confirmPayment instead of confirmCardPayment to handle all payment methods
+                const {error, paymentIntent} = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        // Return to the status page after payment
+                        return_url: `http://localhost:8080/betaling/status?betalingId=${clientSecret.split('_secret_')[0]}`,
+                    },
+                    // Only redirect when payment method requires it
+                    redirect: 'if_required'
                 });
                 
                 if (error) {
@@ -126,7 +138,7 @@
                     resultDiv.style.display = 'block';
                     submitButton.disabled = false;
                     submitButton.textContent = 'Opnieuw proberen';
-                } else if (paymentIntent.status === 'succeeded') {
+                } else if (paymentIntent && paymentIntent.status === 'succeeded') {
                     resultDiv.textContent = 'Betaling geslaagd!';
                     resultDiv.className = 'success';
                     resultDiv.style.display = 'block';
