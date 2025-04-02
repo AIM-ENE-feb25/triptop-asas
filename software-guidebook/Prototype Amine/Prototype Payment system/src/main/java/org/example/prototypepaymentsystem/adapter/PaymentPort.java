@@ -1,6 +1,8 @@
 package org.example.prototypepaymentsystem.adapter;
 
+import org.example.prototypepaymentsystem.dto.PaymentDTO;
+
 public interface PaymentPort {
-//    String createPayment(int amount, String currencyCode);
-//    boolean confirmPayment(String paymentId);
+    void createPayment(PaymentDTO paymentDTO);
+    void confirmPayment(String paymentId);
 }
