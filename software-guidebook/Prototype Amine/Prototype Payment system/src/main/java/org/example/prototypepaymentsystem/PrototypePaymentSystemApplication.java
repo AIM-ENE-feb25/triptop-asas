@@ -1,5 +1,6 @@
 package org.example.prototypepaymentsystem;
 
+import adapter.PaypalAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
