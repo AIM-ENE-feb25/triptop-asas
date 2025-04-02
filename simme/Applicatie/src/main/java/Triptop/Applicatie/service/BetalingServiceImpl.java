@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import Triptop.Applicatie.repository.BetalingRepository;
 import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
 
-
 @Service
 @AllArgsConstructor
 public class BetalingServiceImpl implements BetalingService {
@@ -21,13 +20,22 @@ public class BetalingServiceImpl implements BetalingService {
     @Override
     public BetalingsResultaat verwerkBetaling(BetalingsVerzoek betaling) {
         BetalingAdapter betalingAdapter = betalingFactory.createBetalingAdapter(betaling.getMethode());
-        return betalingAdapter.verwerkBetaling(betaling);
+
+        Betaling betalingResultaat = betalingAdapter.verwerkBetaling(betaling);
+        betalingRepository.save(betalingResultaat);
+
+        BetalingsResultaat resultaat = new BetalingsResultaat();
+        resultaat.setBetalingId(betalingResultaat.getBetalingId());
+        resultaat.setStatus(betalingResultaat.getStatus());
+        resultaat.setRedirectUrl(betalingResultaat.getRedirectUrl());
+
+        return resultaat;
     }
 
     @Override
     public DetailedBetalingStatus haalBetalingOp(String betalingId) {
         Betaling betaling = betalingRepository.findById(betalingId)
-            .orElseThrow(() -> new RuntimeException("Betaling niet gevonden"));
+                .orElseThrow(() -> new RuntimeException("Betaling niet gevonden"));
 
         BetalingAdapter betalingAdapter = betalingFactory.createBetalingAdapter(betaling.getMethode());
         return betalingAdapter.controleerStatus(betalingId);
