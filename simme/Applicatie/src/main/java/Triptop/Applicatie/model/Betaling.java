@@ -14,6 +14,7 @@ public class Betaling {
     @Id
     private String betalingId;
     private String reserveringId;
+    private String redirectUrl;
     private double bedrag;
     private BetalingsStatus status;
     private BetalingsMethode methode;
