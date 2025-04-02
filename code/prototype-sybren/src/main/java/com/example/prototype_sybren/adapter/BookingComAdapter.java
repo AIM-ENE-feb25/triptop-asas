@@ -20,7 +20,7 @@ public class BookingComAdapter {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 
-    public String haalExterneOvernachtingenOp() {
+    public String haalOvernachtingenOp() {
         String output = null;
         try {
 
