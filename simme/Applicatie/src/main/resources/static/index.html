@@ -92,8 +92,7 @@
             const requestBody = {
                 reserveringId: document.getElementById('reserveringId').value,
                 bedrag: parseFloat(document.getElementById('bedrag').value),
-                //methode: document.getElementById('methode').value
-                methode: "STRIPE"
+                methode: document.getElementById('methode').value
             };
             
             try {
