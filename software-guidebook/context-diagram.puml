@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title Systeem Context Diagram voor TripTop Applicatie
+SHOW_PERSON_OUTLINE()
+Person(reiziger, "Reiziger", "Stelt de reis zelf samen, boekt/annuleert/ past aan en betaalt")
+System_Boundary("TripTop","TripTop"){
+    System(triptop, "TripTop", "Online platform voor het plannen, boeken, annuleren en beheren van reizen")
+}
+System_Ext(booking, "Booking API", "Biedt overnachtings­mogelijkheden en huurauto’s voor reizigers")
+System_Ext(activiteiten, "Tripadvisor API", "Biedt excursies/activiteiten")
+System_Ext(vervoer1, "NS API", "Vervoer tussen overnachtingen (trein)")
+System_Ext(vervoer2, "Maps API", "Geeft routes voor de punten waar de reiziger langs wilt.")
+System_Ext(eten, "UberEats API", "Maaltijd- en restaurant­opties")
+
+System_Ext(identity, "WireMock API", "Biedt centrale login zonder extra account aan te maken")
+System_Ext(payment, "Stripe API", "Verwerkt betalingen voor TripTop")
+
+Rel(reiziger, triptop, "Gebruikt TripTop voor het plannen, boeken, aanpassen en annuleren van de reis")
+Rel(triptop, booking, "Haalt overnachtings­mogelijkheden en autohuur­mogelijkheden op en boekt deze indien nodig")
+Rel(triptop, activiteiten, "Haalt activiteiten/excursies op en boekt deze")
+Rel(triptop, vervoer1, "Haalt reisopties (trein) op en boekt deze")
+Rel(triptop, vervoer2, "Haalt alternatieve vervoersopties op (bijv. taxi of routeplan)")
+Rel(triptop, eten, "Haalt eet- en drink­mogelijkheden op (restaurants/bezorging)")
+
+Rel(triptop, identity, "Gebruikt SSO om reizigers te authenticeren")
+Rel(triptop, payment, "Maakt gebruik van externe betalings­systemen voor afrekenen")
+
+@enduml

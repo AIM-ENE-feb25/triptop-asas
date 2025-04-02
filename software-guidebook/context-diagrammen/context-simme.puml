@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Context.puml>
+
+Person(traveler, "Traveler", "Person planning a vacation trip")
+Person(agent, "Travel Agent", "Provides support when needed")
+
+System(triptop, "Triptop", "Vacation planning platform")
+
+System_Ext(booking, "Booking.com", "Accommodation booking service")
+System_Ext(airlines, "Airline Services", "Flight booking services")
+System_Ext(activities, "Activity Providers", "Excursion and activity booking")
+System_Ext(identity, "Identity Provider", "Authentication services")
+System_Ext(payment, "Payment Processors", "Payment services")
+System_Ext(maps, "Map Services", "Location and routing services")
+
+Rel(traveler, triptop, "Plans trips, makes bookings")
+Rel(agent, triptop, "Provides assistance")
+
+Rel(triptop, booking, "Books accommodations")
+Rel(triptop, airlines, "Books flights")
+Rel(triptop, activities, "Books activities and excursions")
+Rel(triptop, identity, "Authenticates users")
+Rel(triptop, payment, "Processes payments")
+Rel(triptop, maps, "Gets routes and locations")
+
+@enduml

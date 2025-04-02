@@ -1,0 +1,40 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+title Dynamic Diagram
+
+Person(reiziger, "Reiziger", "Gebruiker die inlogt")
+Container(frontend, "Frontend", "React, JavaScript", "Stuurt inlogverzoek")
+
+System_Boundary(backendSystem, "Backend (Java, Spring Boot)") {
+
+  Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+  Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+  Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+  Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
+  Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
+
+}
+Container(database, "Database", "MSSQL", "Slaat gebruikers- en tokengegevens op")
+
+Container_Ext(identityProvider, "WireMock API (v1)", "Simuleert centrale identiteitsverificatie en SSO")
+
+Rel_D(reiziger, frontend, " Voert gebruikersnaam & wachtwoord in", "HTTPS")
+Rel_D(frontend, loginController, " Stuurt inlogverzoek", "HTTPS")
+Rel_D(loginController, loginService, " Verwerkt inlogverzoek", "JSON/HTTP")
+Rel_D(loginService, loginPort, " Stuurt authenticatieverzoek", "REST/JSON")
+Rel_D(loginPort, wireMockAdapterV1, " Implementeert (v1)", "REST/JSON")
+Rel_D(wireMockAdapterV1, identityProvider, " Verifieert inloggegevens", "REST/JSON")
+
+Rel_D(identityProvider, wireMockAdapterV1, " Retourneert AuthToken", "REST/JSON")
+Rel_D(wireMockAdapterV1, loginPort, " Retourneert AuthToken", "REST/JSON")
+Rel_D(loginPort, loginService, " Retourneert AuthToken", "REST/JSON")
+
+Rel_D(loginService, userRepository, " Slaat AuthToken of gebruikersdata op", "JDBC/SQL")
+Rel_D(userRepository, database, " Voert CRUD-operatie uit", "JDBC/SQL")
+Rel_D(database, userRepository, " Bevestigt operatie", "JDBC/SQL")
+Rel_D(userRepository, loginService, " Resultaat data/opslaan", "JDBC/SQL")
+
+Rel_D(loginService, loginController, " Retourneert AuthToken", "JSON/HTTP")
+Rel_D(loginController, frontend, " Retourneert AuthToken", "HTTPS")
+Rel_D(frontend, reiziger, " Reiziger is ingelogd", "HTTPS")
+@enduml
