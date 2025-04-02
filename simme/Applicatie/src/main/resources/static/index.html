@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Betaling Voltooien</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        #payment-form {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #card-element {
+            margin-bottom: 20px;
+        }
+        button {
+            background: #5469d4;
+            color: #ffffff;
+            border: 0;
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="payment-form">
+        <h2>Voltooi uw betaling</h2>
+        <div id="card-element">
+            <!-- Stripe Elements will create form elements here -->
+        </div>
+        <button id="submit-button">Betalen</button>
+        <div id="payment-result"></div>
+    </div>
+
+    <script>
+        // Get the client_secret from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientSecret = urlParams.get('client_secret');
+        
+        // Initialize Stripe - replace with your publishable key
+        const stripe = Stripe('pk_test_51N4OmtHDpfFA764U7IN5USKT9qenhutpr7Ux6RMkzJXp7pcQEhxIz0QJkDyUhKzdBpDWCtNWTMy5mhpL1TNN6O7D00tcuQADe2');
+        const elements = stripe.elements();
+        
+        // Create card Element and mount it
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const resultDiv = document.getElementById('payment-result');
+        
+        submitButton.addEventListener('click', async () => {
+            submitButton.disabled = true;
+            
+            const {error, paymentIntent} = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: 'Test User'
+                    }
+                }
+            });
+            
+            if (error) {
+                resultDiv.textContent = `Fout: ${error.message}`;
+                submitButton.disabled = false;
+            } else if (paymentIntent.status === 'succeeded') {
+                resultDiv.textContent = 'Betaling geslaagd!';
+                // Redirect or show success message
+                setTimeout(() => {
+                    window.location.href = `/payment/success?id=${paymentIntent.id}`;
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
