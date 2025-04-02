@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 
-import Triptop.Applicatie.dto.betaling.BetalingsResultaat;
 import Triptop.Applicatie.dto.betaling.BetalingsVerzoek;
 import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
 import Triptop.Applicatie.model.BetalingsStatus;
@@ -23,7 +22,6 @@ public class StripeAdapter implements BetalingAdapter {
 
     @PostConstruct
     public void init() {
-        // Initialize Stripe API with your secret key
         Stripe.apiKey = apiKey;
     }
 
@@ -32,31 +30,20 @@ public class StripeAdapter implements BetalingAdapter {
         Betaling betalingEntity = new Betaling();
 
         try {
-            // Convert amount to cents (Stripe uses smallest currency unit)
             long amountInCents = (long) (betaling.getBedrag() * 100);
 
-            // Create payment intent with multiple payment methods
             PaymentIntentCreateParams.Builder paramsBuilder = PaymentIntentCreateParams.builder()
                     .setAmount(amountInCents)
                     .setCurrency("eur")
                     .setDescription("Reservering: " + betaling.getReserveringId());
 
-            // Either enable automatic payment methods (recommended)
             paramsBuilder.setAutomaticPaymentMethods(
                     PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
                             .setEnabled(true)
                             .build());
 
-            // Or specify payment methods explicitly if you need more control
-            // List<String> paymentMethodTypes = new ArrayList<>();
-            // paymentMethodTypes.add("card");
-            // paymentMethodTypes.add("paypal");
-            // paramsBuilder.addAllPaymentMethodType(paymentMethodTypes);
-
-            // Create the payment intent in Stripe
             PaymentIntent paymentIntent = PaymentIntent.create(paramsBuilder.build());
 
-            // Set the entity values
             betalingEntity.setBetalingId(paymentIntent.getId());
             betalingEntity.setReserveringId(betaling.getReserveringId());
             betalingEntity.setBedrag(betaling.getBedrag());
@@ -79,10 +66,8 @@ public class StripeAdapter implements BetalingAdapter {
         status.setBetalingId(betalingId);
 
         try {
-            // Retrieve payment intent from Stripe
             PaymentIntent paymentIntent = PaymentIntent.retrieve(betalingId);
 
-            // Map Stripe status to your application status
             switch (paymentIntent.getStatus()) {
                 case "succeeded":
                     status.setStatus(BetalingsStatus.VOLTOOID);
@@ -102,7 +87,6 @@ public class StripeAdapter implements BetalingAdapter {
                     status.setStatus(BetalingsStatus.MISLUKT);
             }
 
-            // Set other details
             status.setBedrag(paymentIntent.getAmount() / 100.0);
             status.setTijdstempel(LocalDateTime.now());
             status.setMethode(BetalingsMethode.STRIPE);

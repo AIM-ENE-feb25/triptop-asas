@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import Triptop.Applicatie.dto.betaling.BetalingsVerzoek;
 import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
@@ -36,7 +37,7 @@ public class PaypalAdapter implements BetalingAdapter {
         try {
             Amount amount = new Amount();
             amount.setCurrency("EUR");
-            amount.setTotal(String.format("%.2f", betaling.getBedrag()));
+            amount.setTotal(String.format(Locale.US, "%.2f", betaling.getBedrag()));
 
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
