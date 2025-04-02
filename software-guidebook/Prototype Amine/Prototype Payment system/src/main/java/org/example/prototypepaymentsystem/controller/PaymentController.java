@@ -25,4 +25,15 @@ public class PaymentController {
         paymentService.processPayment(new PaymentDTO(currencyCode, amount));
         return ResponseEntity.ok("Payment of " + amount + " " + currencyCode + " created successfully.");
     }
+
+    @PostMapping("/confirmPayment")
+    public ResponseEntity<String> confirmPayment(@RequestBody Map<String, Object> request) {
+        String paymentId = request.get("id").toString();
+
+        if (paymentId == null || paymentId.isEmpty()) {
+            return ResponseEntity.badRequest().body("No id is provided");
+        }
+        paymentService.confirmPayment(paymentId);
+        return ResponseEntity.ok("Payment paid successfully.");
+    }
 }
