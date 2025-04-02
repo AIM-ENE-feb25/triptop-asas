@@ -14,7 +14,6 @@ import Triptop.Applicatie.dto.betaling.BetalingsVerzoek;
 import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
 import Triptop.Applicatie.model.BetalingsStatus;
 import Triptop.Applicatie.model.Betaling;
-import Triptop.Applicatie.model.BetalingsMethode;
 
 @Component
 public class StripeAdapter implements BetalingAdapter {
@@ -29,7 +28,7 @@ public class StripeAdapter implements BetalingAdapter {
 
     @Override
     public Betaling verwerkBetaling(BetalingsVerzoek betaling) {
-        Betaling resultaat = new Betaling();
+        Betaling betalingEntity = new Betaling();
 
         try {
             // Convert amount to cents (Stripe uses smallest currency unit)
@@ -49,19 +48,21 @@ public class StripeAdapter implements BetalingAdapter {
             // Create the payment intent in Stripe
             PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-            // Set the response values
-            resultaat.setBetalingId(paymentIntent.getId());
-            resultaat.setStatus(BetalingsStatus.PENDING);
-
-            // Client needs this URL to complete payment with Stripe.js
-            resultaat.setRedirectUrl("/payment/complete?client_secret=" + paymentIntent.getClientSecret());
+            // Set the entity values
+            betalingEntity.setBetalingId(paymentIntent.getId());
+            betalingEntity.setReserveringId(betaling.getReserveringId());
+            betalingEntity.setBedrag(betaling.getBedrag());
+            betalingEntity.setMethode(betaling.getMethode());
+            betalingEntity.setStatus(BetalingsStatus.PENDING);
+            betalingEntity.setTijdstempel(LocalDateTime.now());
+            betalingEntity.setRedirectUrl("/stripe-betalen.html?client_secret=" + paymentIntent.getClientSecret());
 
         } catch (StripeException e) {
-            resultaat.setStatus(BetalingsStatus.MISLUKT);
+            betalingEntity.setStatus(BetalingsStatus.MISLUKT);
             System.err.println("Error processing payment: " + e.getMessage());
         }
 
-        return resultaat;
+        return betalingEntity;
     }
 
     @Override
@@ -95,7 +96,6 @@ public class StripeAdapter implements BetalingAdapter {
 
             // Set other details
             status.setBedrag(paymentIntent.getAmount() / 100.0);
-            status.setMethode(BetalingsMethode.STRIPE);
             status.setTijdstempel(LocalDateTime.now());
 
         } catch (StripeException e) {
