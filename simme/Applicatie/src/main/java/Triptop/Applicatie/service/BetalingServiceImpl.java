@@ -38,7 +38,13 @@ public class BetalingServiceImpl implements BetalingService {
                 .orElseThrow(() -> new RuntimeException("Betaling niet gevonden"));
 
         BetalingAdapter betalingAdapter = betalingFactory.createBetalingAdapter(betaling.getMethode());
-        return betalingAdapter.controleerStatus(betalingId);
+
+        var status = betalingAdapter.controleerStatus(betalingId);
+
+        betaling.setStatus(status.getStatus());
+        betalingRepository.save(betaling);
+
+        return status;
     }
 
 }

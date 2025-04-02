@@ -14,6 +14,7 @@ import Triptop.Applicatie.dto.betaling.BetalingsVerzoek;
 import Triptop.Applicatie.dto.betaling.DetailedBetalingStatus;
 import Triptop.Applicatie.model.BetalingsStatus;
 import Triptop.Applicatie.model.Betaling;
+import Triptop.Applicatie.model.BetalingsMethode;
 
 @Component
 public class StripeAdapter implements BetalingAdapter {
@@ -104,6 +105,7 @@ public class StripeAdapter implements BetalingAdapter {
             // Set other details
             status.setBedrag(paymentIntent.getAmount() / 100.0);
             status.setTijdstempel(LocalDateTime.now());
+            status.setMethode(BetalingsMethode.STRIPE);
 
         } catch (StripeException e) {
             status.setStatus(BetalingsStatus.MISLUKT);
