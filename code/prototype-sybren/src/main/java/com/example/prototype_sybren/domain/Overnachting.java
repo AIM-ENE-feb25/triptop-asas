@@ -11,10 +11,8 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Boeking {
-    private int overnachtingId;
-    private Date boekingDatum;
-    private String hotelNaam;
+public class Overnachting {
+    private String bestemming;
     private Date beginDatum;
     private Date eindDatum;
 }

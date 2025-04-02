@@ -1,11 +1,12 @@
 package com.example.prototype_sybren.service;
 
-import com.example.prototype_sybren.domain.Boeking;
+import com.example.prototype_sybren.domain.Overnachting;
+import com.example.prototype_sybren.dto.OvernachtingResponse;
 
 import java.util.List;
 
 public interface BoekingInterface {
 
-    String haalInterneBoekingenOp();
-    String haalExterneBoekingenOp();
+    List<OvernachtingResponse> haalInterneBoekingenOp(Overnachting overnachting);
+    List<OvernachtingResponse> haalExterneBoekingenOp(Overnachting overnachting);
 }

@@ -1,4 +1,4 @@
-package com.example.prototype_sybren.domain;
+package com.example.prototype_sybren.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,9 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Boeking {
-    private int overnachtingId;
-    private Date boekingDatum;
+public class OvernachtingResponse {
+    private int overnachting_id;
+    private String stad;
     private String hotelNaam;
     private Date beginDatum;
     private Date eindDatum;
