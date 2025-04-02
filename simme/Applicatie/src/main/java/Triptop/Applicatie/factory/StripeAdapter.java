@@ -34,19 +34,26 @@ public class StripeAdapter implements BetalingAdapter {
             // Convert amount to cents (Stripe uses smallest currency unit)
             long amountInCents = (long) (betaling.getBedrag() * 100);
 
-            // Create payment intent parameters
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+            // Create payment intent with multiple payment methods
+            PaymentIntentCreateParams.Builder paramsBuilder = PaymentIntentCreateParams.builder()
                     .setAmount(amountInCents)
                     .setCurrency("eur")
-                    .setDescription("Reservering: " + betaling.getReserveringId())
-                    .setAutomaticPaymentMethods(
-                            PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                    .setEnabled(true)
-                                    .build())
-                    .build();
+                    .setDescription("Reservering: " + betaling.getReserveringId());
+
+            // Either enable automatic payment methods (recommended)
+            paramsBuilder.setAutomaticPaymentMethods(
+                    PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                            .setEnabled(true)
+                            .build());
+
+            // Or specify payment methods explicitly if you need more control
+            // List<String> paymentMethodTypes = new ArrayList<>();
+            // paymentMethodTypes.add("card");
+            // paymentMethodTypes.add("paypal");
+            // paramsBuilder.addAllPaymentMethodType(paymentMethodTypes);
 
             // Create the payment intent in Stripe
-            PaymentIntent paymentIntent = PaymentIntent.create(params);
+            PaymentIntent paymentIntent = PaymentIntent.create(paramsBuilder.build());
 
             // Set the entity values
             betalingEntity.setBetalingId(paymentIntent.getId());
