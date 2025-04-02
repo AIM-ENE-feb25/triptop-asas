@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Betaling Voltooien</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #payment-form {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        #payment-element {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #5469d4;
+            color: #ffffff;
+            border: 0;
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background: #4054b2;
+        }
+        #payment-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="payment-form">
+        <h2>Voltooi uw betaling</h2>
+        <div id="payment-element">
+            <!-- Payment Element will create form elements here -->
+        </div>
+        <button id="submit-button">Betalen</button>
+        <div id="payment-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Get the client_secret from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientSecret = urlParams.get('client_secret');
+        
+        if (!clientSecret) {
+            document.getElementById('payment-result').textContent = 'Fout: Geen betaalgegevens gevonden. Ga terug en maak een nieuwe betaling aan.';
+            document.getElementById('payment-result').className = 'error';
+            document.getElementById('payment-result').style.display = 'block';
+            document.getElementById('submit-button').disabled = true;
+            document.getElementById('payment-element').style.display = 'none';
+        } else {
+            // Initialize Stripe with your publishable key
+            const stripe = Stripe('pk_test_51N4OmtHDpfFA764U7IN5USKT9qenhutpr7Ux6RMkzJXp7pcQEhxIz0QJkDyUhKzdBpDWCtNWTMy5mhpL1TNN6O7D00tcuQADe2');
+            
+            // Create elements instance with the client secret
+            const elements = stripe.elements({
+                clientSecret: clientSecret,
+                appearance: {
+                    theme: 'stripe',
+                    variables: {
+                        colorPrimary: '#5469d4',
+                    }
+                }
+            });
+            
+            // Create and mount the Payment Element
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+            
+            // Handle form submission
+            const submitButton = document.getElementById('submit-button');
+            const resultDiv = document.getElementById('payment-result');
+            
+            submitButton.addEventListener('click', async () => {
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="loading"></span> Verwerken...';
+                resultDiv.style.display = 'none';
+                
+                // Use confirmPayment instead of confirmCardPayment to handle all payment methods
+                const {error, paymentIntent} = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        // Return to the status page after payment
+                        return_url: `http://localhost:8080/betaling/status?betalingId=${clientSecret.split('_secret_')[0]}`,
+                    },
+                    // Only redirect when payment method requires it
+                    redirect: 'if_required'
+                });
+                
+                if (error) {
+                    resultDiv.textContent = `Fout: ${error.message}`;
+                    resultDiv.className = 'error';
+                    resultDiv.style.display = 'block';
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Opnieuw proberen';
+                } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                    resultDiv.textContent = 'Betaling geslaagd!';
+                    resultDiv.className = 'success';
+                    resultDiv.style.display = 'block';
+                    submitButton.innerHTML = 'Betaling voltooid';
+                    
+                    // Redirect to status page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = `/betaling/status?betalingId=${paymentIntent.id}`;
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
