@@ -30,4 +30,16 @@ public class BetalingController {
     public DetailedBetalingStatus controleerStatus(@RequestParam String betalingId) {
         return betalingService.haalBetalingOp(betalingId);
     }
+
+    @GetMapping("/success")
+    public String handlePayPalSuccess(@RequestParam String paymentId, @RequestParam String PayerID) {
+        // Execute/capture the payment here
+        return "redirect:/betaling/status?betalingId=" + paymentId;
+    }
+
+    @GetMapping("/cancel")
+    public String handlePayPalCancel() {
+        return "redirect:/";
+    }
+
 }
