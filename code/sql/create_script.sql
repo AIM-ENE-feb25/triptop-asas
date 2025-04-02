@@ -37,7 +37,6 @@ BEGIN
         hotel_naam NVARCHAR(255) NOT NULL,
         begin_datum DATE NOT NULL,
         eind_datum DATE NOT NULL,
-        prijs DECIMAL(10,2) NOT NULL,
         bestemming_id INT NOT NULL,
         FOREIGN KEY (bestemming_id) REFERENCES Bestemming(bestemming_id) ON DELETE CASCADE
     );

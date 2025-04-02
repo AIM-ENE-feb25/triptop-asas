@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OvernachtingResponse {
-    private int overnachting_id;
+    private int overnachtingId;
     private String stad;
     private String hotelNaam;
     private Date beginDatum;
