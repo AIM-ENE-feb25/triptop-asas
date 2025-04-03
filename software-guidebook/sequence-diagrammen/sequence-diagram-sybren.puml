@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Reiziger as reiziger
+participant BoekingController as controller
+participant BoekingOverzichtService as service
+participant BoekingComAdapter as adapter
+participant BoekingRepository as repository
+participant InternBoekingsSysteem as internSyteem
+database Database as sqlDatabase
+
+reiziger -> controller: HTTP POST /overnachting
+controller -> service : haalOvernachtingenOp()
+service -> internSyteem : haalInterneOvernachtingenOp(Overnachting overnachting)
+service -> adapter : haalExterneOvernachtingenOp(Overnachting overnachting)
+internSyteem -> sqlDatabase : haalOvernachtingenOp(Overnachting overnachting)
+service -> controller : Geeft overnachtingen terug
+controller -> reiziger : HTTP 200 Succes + boeking bevestiging
+reiziger -> controller : HTTP post /boeking
+controller -> repository : slaBoekingOp(Boeking boeking)
+repository -> sqlDatabase : SlaBoekingOp(Boeking boeking)
+@enduml
