@@ -3,6 +3,7 @@ package org.example.prototypepaymentsystem.service;
 import org.example.prototypepaymentsystem.adapter.PaypalAdapter;
 import org.example.prototypepaymentsystem.adapter.StripeAdapter;
 import org.example.prototypepaymentsystem.dto.PaymentDTO;
+import org.example.prototypepaymentsystem.repository.PaymentRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,30 +18,40 @@ public class PaymentService {
 
     @Autowired
     private StripeAdapter stripeAdapter;
+    @Autowired
+    private PaymentRepositoryImpl paymentRepositoryImpl;
 
-    public void processPayment(PaymentDTO payment) {
+    public void processPayment(PaymentDTO paymentDTO) {
+        String result;
+
         switch (paymentMethod.toLowerCase()) {
             case "stripe":
-                stripeAdapter.createPayment(payment);
+                result = stripeAdapter.createPayment(paymentDTO);
                 break;
             case "paypal":
-                paypalAdapter.createPayment(payment);
+                result = paypalAdapter.createPayment(paymentDTO);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
         }
+
+        // Opslaan in database
+        paymentRepositoryImpl.savePayment(result, paymentDTO);
     }
 
+
     public void confirmPayment(String paymentId) {
+        Boolean result;
         switch (paymentMethod.toLowerCase()) {
             case "stripe":
-                stripeAdapter.confirmPayment(paymentId);
+                result = stripeAdapter.confirmPayment(paymentId);
                 break;
             case "paypal":
-                paypalAdapter.confirmPayment(paymentId);
+                result = paypalAdapter.confirmPayment(paymentId);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
         }
+        paymentRepositoryImpl.markPaymentAsPaid(paymentId);
     }
 }
