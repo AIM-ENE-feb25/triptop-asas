@@ -19,7 +19,7 @@ class Overnachting {
 
 class BoekingController {
     - BoekingService boekingService
-    + haalOvernachtingenOp(): List<Boeking>
+    + haalOvernachtingenOp(): List<Overnachting>
     + slaBoekingenOp(): List<Boeking>
 }
 
@@ -33,10 +33,10 @@ class BoekingOverzichtService {
     - BoekingRepository boekingRepository
     - BookingComAdapter bookingComAdapter
     - InternBoekingSysteem tripTopService
-    - haalOvernachtingenOp(): List<Boeking>
+    - haalOvernachtingenOp(): List<Overnachting>
     - slaBoekingenOp(): List<Boeking>
-    - haalExterneOvernachtingenOp(): List<Boeking>
-    - haalInterneOvernachtingenOp(): List<Boeking>
+    - haalExterneOvernachtingenOp(): List<Overnachting>
+    - haalInterneOvernachtingenOp(): List<Overnachting>
 }
 
 class BookingComAdapter {
@@ -48,8 +48,8 @@ class InternBoekingSysteem {
 }
 
 interface BoekingInterface {
-    # haalExterneBoekingenOp(): List<Boeking>
-    # haalInterneBoekingenOp(): List<Boeking>
+    # haalExterneOvernachtingenOp(): List<Overnachting>
+    # haalInterneOvernachtingenOp(): List<Overnachting>
 }
 
 BoekingController --> BoekingOverzichtService: "gebruikt"
