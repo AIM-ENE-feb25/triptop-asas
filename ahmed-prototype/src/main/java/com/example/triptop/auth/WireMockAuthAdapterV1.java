@@ -1,13 +1,14 @@
 package com.example.triptop.auth;
 
+import com.example.triptop.dto.CheckResponse;
 import kong.unirest.Unirest;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
-@Component("v1")
-public class V1AuthenticationStrategy implements AuthenticationStrategy {
+@Component("wireMockAuthAdapterV1")
+public class WireMockAuthAdapterV1 implements AuthAdapter {
 
     private static final String LOGIN_URL = "http://identity-wiremock.minordevops.nl:8080/login";
     private static final String CHECK_URL = "http://identity-wiremock.minordevops.nl:8080/checkAppAccess";
@@ -28,19 +29,17 @@ public class V1AuthenticationStrategy implements AuthenticationStrategy {
             System.out.println(responseObject);
             return responseObject.optString("token", null);
         } catch (Exception e) {
-            // Log exception as needed
             return null;
         }
     }
 
     @Override
-    public boolean check(String token, String username, String application) {
+    public CheckResponse check(String token, String username, String application) {
         try {
             JSONObject body = new JSONObject();
             body.put("username", username);
             body.put("application", application);
 
-            // Token passed as a query parameter in v1
             String urlWithToken = CHECK_URL + "?token=" + token;
             HttpResponse<JsonNode> response = Unirest.post(urlWithToken)
                     .header("Content-Type", "application/json")
@@ -48,11 +47,9 @@ public class V1AuthenticationStrategy implements AuthenticationStrategy {
                     .asJson();
 
             kong.unirest.json.JSONObject responseObject = response.getBody().getObject();
-            String accessStatus = responseObject.optString("access", "denied");
-            return "allowed".equalsIgnoreCase(accessStatus);
+            return new CheckResponse(responseObject);
         } catch (Exception e) {
-            return false;
+            return new CheckResponse("denied", "");
         }
     }
-
 }

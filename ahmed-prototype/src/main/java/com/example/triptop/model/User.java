@@ -43,5 +43,4 @@ public class User {
         this.username = username;
     }
 
-    // getters and setters
 }

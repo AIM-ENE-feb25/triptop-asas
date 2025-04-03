@@ -2,7 +2,7 @@ package com.example.triptop.dto;
 
 public class CheckRequest {
     private String username;
-    private String application; // new field
+    private String application;
 
     public CheckRequest() {}
 

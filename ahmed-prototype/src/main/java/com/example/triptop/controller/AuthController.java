@@ -1,18 +1,13 @@
 package com.example.triptop.controller;
 
-import com.example.triptop.auth.AuthenticationStrategy;
-import com.example.triptop.model.User;
 import com.example.triptop.dto.CheckRequest;
+import com.example.triptop.dto.CheckResponse;
 import com.example.triptop.dto.LoginRequest;
 import com.example.triptop.dto.LoginResponse;
-import com.example.triptop.repository.UserRepository;
+import com.example.triptop.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,28 +15,18 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
-    @Qualifier("v1")
-    private AuthenticationStrategy authStrategy;
-
-    @Autowired
-    private UserRepository userRepository;
+    private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        String token = authStrategy.login(loginRequest.getUsername(), loginRequest.getPassword());
-
-        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
-        User user = userOptional.orElse(new User(loginRequest.getUsername()));
-        user.setToken(token);
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new LoginResponse(token));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        LoginResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/check")
-    public ResponseEntity<?> check(@RequestParam String token,
-                                   @RequestBody CheckRequest checkRequest) {
-        boolean access = authStrategy.check(token, checkRequest.getUsername(), checkRequest.getApplication());
-        return ResponseEntity.ok(Collections.singletonMap("access", access));
+    public ResponseEntity<CheckResponse> check(@RequestParam String token,
+                                               @RequestBody CheckRequest checkRequest) {
+        CheckResponse response = authService.check(token, checkRequest);
+        return ResponseEntity.ok(response);
     }
 }
