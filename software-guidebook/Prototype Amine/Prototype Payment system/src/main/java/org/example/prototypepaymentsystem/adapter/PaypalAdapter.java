@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class PaypalAdapter implements PaymentPort {
@@ -33,7 +35,8 @@ public class PaypalAdapter implements PaymentPort {
     private PaypalServerSdkClient client;
 
     @Override
-    public void createPayment(PaymentDTO paymentDTO) {
+    public String createPayment(PaymentDTO paymentDTO) {
+
         CreateOrderInput createOrderInput = new CreateOrderInput.Builder(
                 null,
                 new OrderRequest.Builder(
@@ -54,15 +57,24 @@ public class PaypalAdapter implements PaymentPort {
                 .prefer("return=minimal")
                 .build();
 
+        CompletableFuture<String> ratFuture = new CompletableFuture<>();
+
         ordersController.createOrderAsync(createOrderInput).thenAccept(result -> {
-            System.out.println(result.getResult());
+            System.out.println("Order created: " + result.getResult().getId());
+            ratFuture.complete(result.getResult().getId());
         }).exceptionally(exception -> {
             exception.printStackTrace();
             return null;
         });
-    }
+            try {
+                return ratFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
 
-    public void confirmPayment(String paymentId) {
+    public Boolean confirmPayment(String paymentId) {
         CaptureOrderInput captureOrderInput = new CaptureOrderInput.Builder(
                 paymentId,
                 null
@@ -88,20 +100,30 @@ public class PaypalAdapter implements PaymentPort {
                         .build())
                 .build();
 
+        CompletableFuture<Boolean> resultFuture = new CompletableFuture<>();
+
         ordersController.confirmOrderAsync(confirmOrderInput).thenAccept(resultConfirm -> {
             ordersController.captureOrderAsync(captureOrderInput).thenAccept(resultCapture -> {
                 System.out.println(resultCapture.getResult());
+                resultFuture.complete(true);
             }).exceptionally(exception -> {
                 exception.printStackTrace();
+                resultFuture.complete(false);
                 return null;
             });
             System.out.println(resultConfirm.getResult());
         }).exceptionally(exception -> {
             exception.printStackTrace();
+            resultFuture.complete(false);
             return null;
         });
 
-
+        try {
+            return resultFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public void configure() {

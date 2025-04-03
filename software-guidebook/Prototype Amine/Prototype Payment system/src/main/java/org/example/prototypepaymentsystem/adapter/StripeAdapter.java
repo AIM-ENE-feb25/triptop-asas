@@ -1,18 +1,12 @@
 package org.example.prototypepaymentsystem.adapter;
 
-import com.paypal.sdk.Environment;
-import com.paypal.sdk.PaypalServerSdkClient;
-import com.paypal.sdk.authentication.ClientCredentialsAuthModel;
-import com.paypal.sdk.controllers.OrdersController;
 import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCaptureParams;
 import com.stripe.param.PaymentIntentConfirmParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
 import org.example.prototypepaymentsystem.dto.PaymentDTO;
-import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +26,7 @@ public class StripeAdapter implements PaymentPort {
 
     private StripeClient client;
     @Override
-    public void createPayment(PaymentDTO paymentDTO) {
+    public String createPayment(PaymentDTO paymentDTO) {
 
         PaymentIntentCreateParams params =
                 PaymentIntentCreateParams.builder()
@@ -47,14 +41,16 @@ public class StripeAdapter implements PaymentPort {
         try{
             PaymentIntent paymentIntent = client.paymentIntents().create(params);
             System.out.println(paymentIntent);
+            return paymentIntent.getId();
     }catch (StripeException e){
             System.out.println("Error: "+e.getMessage());
         e.printStackTrace();
     }
+        return null;
     }
 
     @Override
-    public void confirmPayment(String paymentId) {
+    public Boolean confirmPayment(String paymentId) {
         try {
             PaymentIntent resource = client.paymentIntents().retrieve(paymentId);
 
@@ -65,10 +61,11 @@ public class StripeAdapter implements PaymentPort {
                             .build();
             PaymentIntent paymentConfirm = resource.confirm(paramsConfirm);
 
-            System.out.println(paymentConfirm);
+            return paymentConfirm.getStatus().equals("succeeded");
         } catch (StripeException e) {
             System.out.println("Error: "+e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 
