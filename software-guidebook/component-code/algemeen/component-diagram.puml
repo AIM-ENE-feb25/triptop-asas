@@ -40,8 +40,6 @@ System_Boundary(triptop, "Boeking Systeem") {
      Component(gebruikerRepository, "Gebruiker Repository", "Spring Data JPA", "Slaat gebruikersgegevens op")
      Component(betalingRepository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
 
-     Rel(betalingController, betalingService, "Stuurt betalingsverzoeken", "JSON/HTTP")
-
      Rel(betalingService, paymentFactory, "Creëert", "Method Call")
      Rel(paymentFactory, stripeAdapter, "Creëert indien nodig", "Instantiation")
      Rel(paymentFactory, paypalAdapter, "Creëert indien nodig", "Instantiation")
