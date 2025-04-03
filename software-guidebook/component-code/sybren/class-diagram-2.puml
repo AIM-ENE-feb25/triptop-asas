@@ -2,15 +2,21 @@
 title Class Diagram – Boeking Hoe kunnen verschillende boekingsservices (zoals Booking.com en eigen beheer in Triptop) worden geïntegreerd?
 
 class Boeking {
-    -Int boekingId
-    -Int reizigerId
-    -Date boekingsDatum
-    -Date vertrekDatum
-    -Date aankomstDatum
-    -String vertrekLocatie
-    -String aankomstLocatie
-    -Double prijs
+    -int overnachtingsId
+    -Date BoekingDatum;
+    - String hotelNaam
+    -Date beginDatum
+    -Date eindDatum
 }
+
+class Overnachting {
+    - int overnachtingsId;
+    - String stad;
+    - String hotelNaam;
+    - Date beginDatum;
+    - Date eindDatum;
+}
+
 class BoekingController {
     - BoekingService boekingService
     + haalOvernachtingenOp(): List<Boeking>
@@ -23,10 +29,10 @@ class BoekingRepository {
 }
 
 
-class FacadeService {
+class BoekingOverzichtService {
     - BoekingRepository boekingRepository
     - BookingComAdapter bookingComAdapter
-    - TripTopService tripTopService
+    - InternBoekingSysteem tripTopService
     - haalOvernachtingenOp(): List<Boeking>
     - slaBoekingenOp(): List<Boeking>
     - haalExterneOvernachtingenOp(): List<Boeking>
@@ -37,7 +43,7 @@ class BookingComAdapter {
     - haalOvernachtingenOp()
 }
 
-class TripTopService {
+class InternBoekingSysteem {
     - haalOvernachtingenOp()
 }
 
@@ -46,12 +52,13 @@ interface BoekingInterface {
     # haalInterneBoekingenOp(): List<Boeking>
 }
 
-BoekingController --> FacadeService: "gebruikt"
+BoekingController --> BoekingOverzichtService: "gebruikt"
 BoekingController --> Boeking: "gebruikt"
-FacadeService --> BoekingRepository: "gebruikt"
-FacadeService --> BoekingInterface: "implementeert"
-FacadeService  --> BookingComAdapter : "gebruikt"
-FacadeService --> TripTopService : "gebruikt"
+BoekingController --> Overnachting: "gebruikt"
+BoekingOverzichtService --> BoekingRepository: "gebruikt"
+BoekingOverzichtService --> BoekingInterface: "implementeert"
+BoekingOverzichtService  --> BookingComAdapter : "gebruikt"
+BoekingOverzichtService --> InternBoekingSysteem : "gebruikt"
 
 
 @enduml
