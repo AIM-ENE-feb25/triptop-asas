@@ -2,7 +2,17 @@
 
 package "Controller Layer" {
     class PaymentController {
-        + processPayment(paymentRequest: PaymentRequest): ResponseEntity
+        - PaymentService paymentService
+
+        + ResponseEntity<String> createPayment(Map<String, Object> request)
+        + ResponseEntity<String> confirmPayment(Map<String, Object> request)
+    }
+}
+
+package "domain" {
+    class PaymentDTO {
+        + String currencyCode
+        + double amount
     }
 }
 
@@ -15,28 +25,44 @@ package "Service Layer" {
 
 package "Repository Layer" {
     interface PaymentRepository {
-        + save(payment: Payment): void
+        + void savePayment(String paymentId, PaymentDTO paymentDTO)
+        + void markPaymentAsPaid(String paymentId)
     }
-        class PaymentRepositoryImpl implements PaymentRepository {
-                Long id
-                Double amount
-                String status
-            + save(payment: Payment): void
-        }
+    class PaymentRepositoryImpl  implements PaymentRepository {
+        - JdbcTemplate jdbcTemplate
+
+        + void savePayment(String paymentId, PaymentDTO paymentDTO)
+        + void markPaymentAsPaid(String paymentId)
+    }
 }
 
-
-
 package "Adapter Layer" {
-    interface PaymentPort {
-        + processPayment(amount: Double): PaymentResponse
+interface PaymentPort {
+        + String createPayment(PaymentDTO paymentDTO)
+        + Boolean confirmPayment(String paymentId)
     }
     class StripeAdapter implements PaymentPort {
-        + processPayment(amount: Double): PaymentResponse
+        - String clientId
+        - String clientSecret
+        - StripeClient client
+
+        + void init()
+        + String createPayment(PaymentDTO paymentDTO)
+        + Boolean confirmPayment(String paymentId)
+        + void configure()
     }
-        class PaypalAdapter(Fictief) implements PaymentPort {
-            + processPayment(amount: Double): PaymentResponse
-        }
+
+    class PaypalAdapter implements PaymentPort {
+        - String OAuthClientId
+        - String OAuthClientSecret
+        - OrdersController ordersController
+        - PaypalServerSdkClient client
+
+        + void init()
+        + String createPayment(PaymentDTO paymentDTO)
+        + Boolean confirmPayment(String paymentId)
+        + void configure()
+    }
 
 
 }
@@ -44,9 +70,6 @@ package "Adapter Layer" {
 PaymentService --> PaymentPort
 PaymentController --> PaymentService
 PaymentService --> PaymentRepository
-
-
-
-PaymentRepository --> Payment
+PaymentController --> PaymentDTO
 
 @enduml
