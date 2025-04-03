@@ -10,7 +10,6 @@ class LoginController <<Controller>> {
 
 class LoginService <<Service>> {
     + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
-    + handleFallbackScenario() ' optioneel
     - LoginPort loginPort
     - LoginRepo loginRepo
 }
@@ -41,6 +40,14 @@ class Reiziger <<Entity>> {
     - String username
     - String password
 }
+'class V1UserAuth <<Record>> {
+'    - String username
+'    - String token `32 bits
+'}
+'class V2UserAuth <<Record>> {
+'    - String username
+'    - String token `64 bits
+'}
 
 LoginController --> LoginService : uses
 LoginService --> AuthenticationException : «throws»
@@ -49,5 +56,7 @@ LoginPort <|.. WireMockAdapterV1 : «implements»
 LoginPort <|.. WireMockAdapterV2 : «implements»
 LoginService --> LoginRepo : uses
 LoginRepo <|.. LoginRepoImpl : «implements»
+'WireMockAdapterV1 --> V1UserAuth: uses
+'WireMockAdapterV2 --> V2UserAuth: uses
 
 @enduml

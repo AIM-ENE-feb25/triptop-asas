@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <title>TripTop Auth Frontend</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; max-width: 400px; }
+    label { display: inline-block; width: 120px; margin-bottom: 10px; }
+    input { margin-bottom: 10px; width: 200px; padding: 4px; }
+    button { padding: 6px 12px; }
+    .result { margin-top: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>TripTop Authentication</h1>
+
+<section>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="loginUsername">Username:</label>
+        <input type="text" id="loginUsername" name="username" required /><br/>
+
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" name="password" required /><br/>
+
+        <button type="submit">Login</button>
+    </form>
+    <div id="loginResult" class="result"></div>
+</section>
+
+<section>
+    <h2>Check Access</h2>
+    <form id="checkForm">
+        <label for="checkToken">Token:</label>
+        <input type="text" id="checkToken" name="token" required /><br/>
+
+        <label for="checkUsername">Username:</label>
+        <input type="text" id="checkUsername" name="username" required /><br/>
+
+        <label for="checkApplication">Application:</label>
+        <input type="text" id="checkApplication" name="application" value="triptop" required /><br/>
+
+        <button type="submit">Check</button>
+    </form>
+    <div id="checkResult" class="result"></div>
+</section>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    fetch('http://localhost:8081/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+})
+    .then(response => response.json())
+    .then(data => {
+    if (data.token) {
+    document.getElementById('loginResult').textContent = 'Token: ' + data.token;
+} else {
+    document.getElementById('loginResult').textContent = 'Login failed. No token received.';
+}
+})
+    .catch(error => {
+    document.getElementById('loginResult').textContent = 'Error: ' + error;
+});
+});
+
+    document.getElementById('checkForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = document.getElementById('checkToken').value;
+    const username = document.getElementById('checkUsername').value;
+    const application = document.getElementById('checkApplication').value;
+
+    // For v1, token is passed as a query parameter.
+    fetch('http://localhost:8081/auth/check?token=' + encodeURIComponent(token), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, application })
+})
+    .then(response => response.json())
+    .then(data => {
+    if (data.access !== undefined) {
+    document.getElementById('checkResult').textContent = 'Access: ' + data.access;
+} else {
+    document.getElementById('checkResult').textContent = 'Check failed.';
+}
+})
+    .catch(error => {
+    document.getElementById('checkResult').textContent = 'Error: ' + error;
+});
+});
+</script>
+</body>
+</html>
