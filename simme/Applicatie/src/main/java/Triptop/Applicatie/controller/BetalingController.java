@@ -33,9 +33,9 @@ public class BetalingController {
     }
 
     @GetMapping("/success")
-    public RedirectView handlePayPalSuccess(@RequestParam String paymentId, @RequestParam String PayerID) {
+    public RedirectView handlePayPalSuccess(@RequestParam String betalingId, @RequestParam String status) {
         // Execute/capture the payment here
-        return new RedirectView("/betaling/status?betalingId=" + paymentId);
+        return new RedirectView("/betaling/status?betalingId=" + betalingId);
     }
 
     @GetMapping("/cancel")
