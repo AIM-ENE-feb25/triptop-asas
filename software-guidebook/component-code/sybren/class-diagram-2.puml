@@ -20,21 +20,21 @@ class Overnachting {
 class BoekingController {
     - BoekingService boekingService
     + haalOvernachtingenOp(): List<Overnachting>
-    + slaBoekingenOp(): List<Boeking>
+    + slaBoekingOp(): Boeking
 }
 
 
 class BoekingRepository {
-    + slaBoekingenOp()
+    + slaBoekingOp()
 }
 
 
 class BoekingOverzichtService {
     - BoekingRepository boekingRepository
     - BookingComAdapter bookingComAdapter
-    - InternBoekingSysteem tripTopService
+    - InternBoekingSysteem internBoekingSysteem
     - haalOvernachtingenOp(): List<Overnachting>
-    - slaBoekingenOp(): List<Boeking>
+    - slaBoekingOp(): Boeking
     - haalExterneOvernachtingenOp(): List<Overnachting>
     - haalInterneOvernachtingenOp(): List<Overnachting>
 }
