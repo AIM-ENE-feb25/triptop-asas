@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  database_server:
+    image: mcr.microsoft.com/mssql/server
+    env_file:
+      - variables.env
+    ports:
+      - target: 1433
+        published: 1434
+        protocol: tcp
+        mode: host
+    volumes:
+      - data-volume:/var/opt/mssql
+volumes:
+  data-volume:
