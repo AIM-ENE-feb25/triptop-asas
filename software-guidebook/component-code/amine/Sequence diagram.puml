@@ -1,0 +1,24 @@
+@startuml
+autonumber
+
+actor User
+participant PaymentController
+participant PaymentService
+participant PaymentRepository
+participant StripeAdapter
+
+User -> PaymentController : HTTP POST/createPayment(request)
+PaymentController -> PaymentService : handlePayment(paymentRequest)
+PaymentService -> StripeAdapter : createPayment(paymentDTO)
+StripeAdapter -> PaymentService : paymentId
+PaymentService -> PaymentRepository : savePayment(paymentId, paymentDTO)
+PaymentService -> PaymentController : ResponseEntity<String>
+
+User -> PaymentController : confirmPayment(request)
+PaymentController -> PaymentService : confirmPayment(paymentId)
+PaymentService -> StripeAdapter : confirmPayment(paymentId)
+StripeAdapter -> PaymentService : Boolean
+   PaymentService -> PaymentRepository : markPaymentAsPaid(paymentId)
+PaymentService -> PaymentController : ResponseEntity<String>
+
+@enduml

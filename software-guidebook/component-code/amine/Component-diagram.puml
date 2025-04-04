@@ -16,7 +16,7 @@ System_Boundary(backendSystem, "Backend [Java, Spring Boot]") {
 
 }
 
-Container(database, "Database", "?", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+Container(database, "Database", "mssql", "Slaat reizen, bouwstenen en gebruikersgegevens op")
 
 System_Ext(payment_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
 

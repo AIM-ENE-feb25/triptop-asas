@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PayPal Betaling</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #payment-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        #paypal-button-container {
+            margin-top: 20px;
+        }
+        #payment-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+    <!-- Add PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AUxgrM7CvQa1ZCq6R1s7LJZG5SS6sbpEBJA9-QUjhGyvzBSVJVIk5pkqekxjCjhjaSFkRoWkRDOSQ9YD&currency=EUR"></script>
+</head>
+<body>
+    <div id="payment-container">
+        <h2>Voltooi uw PayPal betaling</h2>
+        
+        <div id="paypal-button-container"></div>
+        <div id="payment-result"></div>
+    </div>
+
+    <script>
+        // Get the payment ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('paymentId');
+        
+        if (!paymentId) {
+            document.getElementById('payment-result').textContent = 'Fout: Geen betalingsgegevens gevonden. Ga terug en maak een nieuwe betaling aan.';
+            document.getElementById('payment-result').className = 'error';
+            document.getElementById('payment-result').style.display = 'block';
+            document.getElementById('paypal-button-container').style.display = 'none';
+        } else {
+            // Initialize PayPal buttons
+            paypal.Buttons({
+                // Transaction details are already set on the server
+                createOrder: function() {
+                    // Return the payment ID from the server
+                    return paymentId;
+                },
+                
+                // Called when payment is approved
+                onApprove: function(data, actions) {
+                    // Show success message
+                    const resultDiv = document.getElementById('payment-result');
+                    resultDiv.textContent = 'Betaling wordt verwerkt...';
+                    resultDiv.className = 'success';
+                    resultDiv.style.display = 'block';
+                    
+                    // Redirect to status page
+                    setTimeout(() => {
+                        window.location.href = `/betaling/status?betalingId=${paymentId}`;
+                    }, 1500);
+                },
+                
+                // Called when payment is canceled
+                onCancel: function() {
+                    const resultDiv = document.getElementById('payment-result');
+                    resultDiv.textContent = 'Betaling geannuleerd.';
+                    resultDiv.className = 'error';
+                    resultDiv.style.display = 'block';
+                    
+                    // Redirect to cancel page
+                    setTimeout(() => {
+                        window.location.href = `/betaling/cancel?betalingId=${paymentId}`;
+                    }, 1500);
+                },
+                
+                // Called when an error occurs
+                onError: function(err) {
+                    const resultDiv = document.getElementById('payment-result');
+                    resultDiv.textContent = `Fout bij verwerken betaling: ${err}`;
+                    resultDiv.className = 'error';
+                    resultDiv.style.display = 'block';
+                }
+            }).render('#paypal-button-container');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+@startuml
+title Dynamic Component Diagram – TripTop Backend
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+top to bottom direction
+Person(Gebruiker, "Reiziger", "Gebruiker die inlogt")
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+
+System_Boundary(backendSystem, "Backend [Java, Spring Boot]") {
+    Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
+    Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
+    Component(paymentRepository, "Payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
+    Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
+}
+
+Container(database, "Database", "MSSQL", "Slaat reizen, bouwstenen en gebruikersgegevens op")
+
+System_Ext(payment_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
+
+' Interactiestroom bij een betaling
+Rel_D(Gebruiker, frontend, "Start betaling")
+Rel_D(frontend, paymentController, "Stuurt betalingsverzoek (HTTPS)")
+Rel_D(paymentController, paymentService, "Verwerkt betaling (JSON/HTTP)")
+Rel_D(paymentService, paymentRepository, "Slaat betaling op (JDBC/SQL)")
+Rel_D(paymentRepository, database, "Slaat betalingsgegevens op")
+
+Rel_D(paymentService, paymentAdapter, "Roept externe betaalservice aan (REST/JSON)")
+Rel_D(paymentAdapter, payment_provider, "Verstuurt betalingsinformatie (REST/JSON)")
+Rel_D(payment_provider, paymentAdapter, "Bevestigt betaling")
+Rel_D(paymentAdapter, paymentService, "Geeft betalingsstatus door")
+Rel_D(paymentService, paymentController, "Stuurt resultaat terug (JSON/HTTP)")
+Rel_D(paymentController, frontend, "Retourneert betalingsstatus")
+Rel_D(frontend, Gebruiker, "Geeft betalingsbevestiging weer")
+
+@enduml
