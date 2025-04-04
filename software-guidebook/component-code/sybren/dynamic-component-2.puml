@@ -4,7 +4,6 @@
 title Component diagram van TripTop voor het TripTop systeem
 
 Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
-Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
 
 System_Boundary(triptop, "Boeking Systeem") {
     Component(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
@@ -22,7 +21,6 @@ System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accom
 
 ' Relaties gebruiker naar containers
 Rel(reiziger, frontend, "Gebruikt via webbrowser")
-Rel(ondersteuner, frontend, "Ondersteunt reizigers via webinterface")
 
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, controller, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
