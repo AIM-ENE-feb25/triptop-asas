@@ -1,0 +1,20 @@
+# Versiebeheerbestanden en -mappen
+.git
+.gitignore
+
+# Logbestanden
+*.log
+
+# IDE-specifieke bestanden
+.idea/
+.vscode/
+
+# Besturingssysteem-specifieke bestanden
+.DS_Store
+Thumbs.db
+
+# Docker-compose bestanden
+docker-compose.yml
+
+# Overige tijdelijke of ongewenste bestanden
+*.tmp

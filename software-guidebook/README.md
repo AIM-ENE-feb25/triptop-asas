@@ -85,10 +85,227 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 > [!IMPORTANT]
 > Beschrijf zelf de beperkingen die op voorhand bekend zijn die invloed hebben op keuzes die wel of niet gemaakt kunnen of mogen worden.
 
-## 6. Principles
+## 6. Ontwerpvragen
 
-> [!IMPORTANT]
-> Beschrijf zelf de belangrijkste architecturele en design principes die zijn toegepast in de software.
+## Toelichting Ahmed
+
+### Ontwerpvraag
+Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat een wijziging in de API van een externe service niet leidt tot een wijziging in de front-end maar flexibel kan worden opgevangen door de back-end?
+### Context
+
+De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd is op de WireMock API. Gebruikers loggen in via deze externe service, en de applicatie haalt daarvoor een token op en controleert de toegangsrechten via een "check" endpoint.
+
+#### Oude API
+
+- **Login Endpoint (Oude API):**  
+  De oude WireMock API voor login accepteerde een JSON-bericht waarin de gebruikersnaam en het wachtwoord werden meegegeven.  
+  **Response:**
+  - Het token werd teruggegeven in de JSON body.
+  - Voorbeeld response:
+    ```json
+    {
+      "token": "abc123def456"  
+    }
+    ```
+- **Check Endpoint (Oude API):**  
+  De check endpoint werd aangeroepen met het token als query parameter en de overige gegevens (gebruikersnaam en application) in de JSON body.  
+  **Response:**
+  - De response was een JSON object met bijvoorbeeld:
+    ```json
+    {
+      "access": "allowed",
+      "role": "klant"
+    }
+    ```
+
+#### Nieuwe API
+
+- **Login Endpoint (Nieuwe API):**  
+  In de nieuwe WireMock versie is er een wijziging doorgevoerd:
+  - Het login endpoint geeft nu een token terug in de response-header in plaats van in de JSON body.
+
+- **Check Endpoint (Nieuwe API):**  
+  Ook het check endpoint is gewijzigd:
+  - Het token wordt nu meegegeven in de HTTP header (bijvoorbeeld in de `Authorization` header) in plaats van als query parameter.
+  - Bovendien wordt de response in XML teruggegeven in plaats van JSON.
+  - Voorbeeld response:
+    ```xml
+    <response>
+      <access>allowed</access>
+      <role>klant</role>
+    </response>
+    ```
+
+### Design Patterns en Design Principles
+
+
+1. **Adapter Pattern:**
+- We hebben een uniforme interface (bijvoorbeeld `AuthAdapter`) gedefinieerd die twee concrete implementaties heeft:
+  - **WireMockAuthAdapterV1:** voor de oude API.
+  - **WireMockAuthAdapterV2:** voor de nieuwe API.
+- Beide adapters bieden dezelfde methodes (bijv. `login()` en `check()`) en retourneren altijd een uniform DTO (bijvoorbeeld `LoginResponse` en `CheckResponse`).
+- Hierdoor hoeft de controller (en dus de front-end) niets te weten van de verschillen tussen de oude en nieuwe API. Alleen de back-end adapter past zich aan op basis van de configuratie of op basis van de tokenlengte (bijvoorbeeld: bestaande gebruikers blijven via V1, nieuwe gebruikers via V2).
+
+2. **Single Responsibility Principle (SRP):**
+- Elke klasse heeft één verantwoordelijkheid. Zo beheert de adapter de communicatie met de externe API en vertaalt deze response naar de interne DTO's.
+- De service laag beheert de businesslogica en de gebruikerssessies, terwijl de controller zich alleen richt op het ontvangen en retourneren van HTTP-verzoeken.
+
+3. **Open/Closed Principle (OCP):**
+- De back-end is zo opgezet dat deze openstaat voor uitbreiding (bijvoorbeeld voor een derde versie van de API) zonder dat bestaande code aangepast hoeft te worden. Nieuwe adapters kunnen eenvoudig toegevoegd worden.
+
+4. **Dependency Inversion Principle (DIP):**
+- De controller en service laag werken tegen de abstracte interface (`AuthAdapter`) in plaats van tegen concrete implementaties. Hierdoor kunnen we de concrete implementatie (V1 of V2) eenvoudig wisselen zonder dat de hogere lagen (controller, service) gewijzigd hoeven te worden.
+
+#### Component Diagram
+![Component Diagram](component-code/ahmed/component-Component_Diagram___TripTop_Backend.png)
+
+#### Toelichting Component Diagram
+
+- **Frontend:**  
+  De gebruikersinterface die de gebruiker in staat stelt om reizen te plannen en te beheren.
+
+- **Backend (Java, Spring Boot):**  
+  De backend bestaat uit verschillende lagen:
+  - **Login Controller:** Ontvangt inlogverzoeken van de frontend.
+  - **Login Service:** Behandelt de authenticatielogica en maakt gebruik van een uniforme interface voor externe authenticatie (AuthAdapter).
+  - **AuthAdapter:** Dit is de abstractie die door twee concrete adapters wordt geïmplementeerd, namelijk de WireMock Adapter v1 en v2.
+  - **User Repository:** Slaat gebruikersgegevens op in de database.
+
+- **Externe Systemen:**  
+  Twee WireMock API’s simuleren de externe identiteitprovider:
+  - Eén voor de oude API (v1) en één voor de nieuwe API (v2).
+
+- **Database:**  
+  Een MSSQL-database die gebruikers informatie beheert.
+
+---
+
+#### Code Diagram – TripTop Applicatie
+
+
+![Code Diagram](component-code/ahmed/login-Login_Component_Class_Diagram.png)
+#### Toelichting Code Diagram
+
+- **AuthController:**  
+  De controller ontvangt HTTP-verzoeken (login en check) en roept de AuthService aan om de businesslogica uit te voeren. Hij ontvangt en retourneert DTO's (AuthLoginRequest/Response en AuthCheckRequest/Response).
+
+- **AuthService:**  
+  Deze service beheert de authenticatielogica en de gebruikersgegevens via de UserRepository en maakt gebruik van de AuthAdapter (interface) voor externe authenticatie.
+
+- **AuthAdapter:**  
+  Een interface die de contracten definieert voor de externe authenticatie. Er zijn twee concrete implementaties:
+  - **WireMockAuthAdapterV1:** Werkt met de oude API (JSON response; token via URL).
+  - **WireMockAuthAdapterV2:** Werkt met de nieuwe API (XML response; token via header).  
+    De note geeft aan dat in deze adapter de XML response wordt geconverteerd naar een AuthCheckResponse DTO (Adapter Pattern).
+
+- **UserRepository en User:**  
+  Beheren de gebruikersgegevens in de database via JPA.
+
+- **DTO's:**  
+  De Data Transfer Objects zorgen voor een uniforme manier van gegevensuitwisseling tussen de lagen. Ze omvatten:
+  - **AuthLoginRequest:** Bevat gebruikersnaam en wachtwoord.
+  - **AuthLoginResponse:** Bevat het token na een succesvolle login.
+  - **AuthCheckRequest:** Bevat gebruikersnaam en de application voor de check.
+  - **AuthCheckResponse:** Bevat de toegangsstatus (access) en de rol (role) na het uitvoeren van de check.
+
+---
+## Toelichting Amine
+### ontwerpvraag
+Ik heb voor dit project gekozen voor de ontwerpvraag: Hoe zorg je ervoor dat je makkelijk de ene externe service kan vervangen door een andere die ongeveer hetzelfde doet?
+Ik vond deze vraag interessant omdat ik in mijn project met verschillende externe services moet werken en het belangrijk is dat ik deze makkelijk kan vervangen zonder dat dit invloed heeft op de rest van de applicatie.
+
+### Bijpassend design pattern
+Het design pattern waar ik voor gekozen heb is het Adapter pattern. Dit pattern maakt het mogelijk om de communicatie met externe services op een uniforme manier te organiseren. Door gebruik te maken van adapters kan ik verschillende externe services integreren zonder dat dit invloed heeft op de rest van de applicatie. Dit zorgt ervoor dat ik makkelijk kan switchen tussen verschillende services zonder dat ik de rest van de applicatie hoef aan te passen.
+
+Ik heb voor dit project meerdere design patterns overwogen, maar uiteindelijk gekozen voor het Adapter pattern omdat dit het beste aansluit bij mijn ontwerpvraag. Het Strategy Pattern bijvoorbeeld zou ook een optie zijn, maar dit zou meer complexiteit met zich meebrengen dan nodig is voor dit project. Het Adapter pattern is eenvoudig te implementeren en zorgt ervoor dat ik makkelijk kan switchen tussen verschillende externe services zonder dat dit invloed heeft op de rest van de applicatie.
+
+In dit geval maak ik gebruik van de Paypal API en de Stripe API. Beide APIs hebben verschillende endpoints en vereisen verschillende parameters, maar door gebruik te maken van adapters kan ik deze verschillen opvangen en de communicatie met de externe services op een uniforme manier organiseren.
+
+### Design Principle
+Ik heb ervoor gekozen om het Dependency Inversion Principle (DIP) toe te passen in mijn ontwerp. Dit principe stelt dat hoog-niveau modules niet afhankelijk moeten zijn van laag-niveau modules, maar beide afhankelijk moeten zijn van abstracties. Dit betekent dat ik de adapters en de service moet scheiden, zodat de service niet afhankelijk is van een specifieke adapter, maar alleen van de abstractie (de PaymentPort). Hierdoor kan ik makkelijk switchen tussen verschillende adapters zonder dat dit invloed heeft op de rest van de applicatie.
+
+
+### Component diagram
+![component diagram](component-code/amine/Component%20diagram.png)
+
+Hierboven zie je mijn component diagram. Ik heb in dit geval alleen het gedeelte van de betalingen gemaakt.
+Wat goed is im in het achterhoofd te houden is dat er wel sprake is van een payment Port, maar ik deze niet heb meegenomen omdat deze in de Service zit.
+Verder toon ik in dit diagram alleen de stripe adapter. De bedoeling is dat ik de stripe adapter en de paypal adapter gemakkelijk moet kunnen omwisselen.
+
+### Dynamic component diagram
+![Dynamic component diagram](component-code/amine/Dynamic Component%20diagram.png)
+
+Hierboven zie je mijn dynamische component diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
+
+
+### code diagram
+![code diagram](component-code/amine/Code%20diagram.png)
+
+Hierboven zie je mijn code diagram. Hier ga ik specifiek in op de technische zaken. Ik heb voor dit prototype goed gekeken naar wat de gemene deler was voor het afhandelen van een betaling voor de stripe en paypal API. In beide gevallen moest er eerst een "order" gemaakt worden die vervolgens geaccepteerd kan worden. Ik heb de functies voor het maken van de order en het accepteren van de order in een "PaymentPort" gezet. Dit zorgt ervoor dat ik deze functies makkelijk kan implementeren in de adapters voor de verschillende externe services.
+Hierdoor kan ik door middel van het aangeven in de properties gemakkelijk omschakelen van Paypal naar Stripe.
+De betalingen worden uiteraard ook netjes opgeslagen in de database.
+
+### sequence diagram
+![sequence diagram](component-code/amine/Sequence%20diagram.png)
+
+Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
+
+## Toelichting Simme
+
+Hoe kunnen we verschillende betalingssystemen integreren voor de verschillende bouwstenen?
+
+## Component Diagram
+![Component Diagram](component-code/simme/component-diagram.png)
+Dit diagram toont de structurele organisatie en afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
+
+- Een duidelijke scheiding tussen frontend en backend-componenten, met een API-grens via de BetalingController
+- Hoe de BetalingService als orchestrator fungeert voor het betalingsproces
+- De interne opdeling in gespecialiseerde adapters voor elke betalingsprovider
+- De BetalingFactory als centraal punt voor het selecteren van de juiste adapter
+- De connectie met externe betalingssystemen via gestandaardiseerde interfaces
+
+Deze componentarchitectuur vormt een "payment hub"-benadering, waarbij een gespecialiseerde laag tussen de kernbusiness-logica en externe betalingsproviders wordt geplaatst. Dit patroon biedt flexibiliteit voor het uitbreiden met nieuwe betalingsmethoden en isoleert de impact van wijzigingen in externe systemen.
+
+De gekozen architectuur implementeert de aanbevolen praktijken voor betalingssysteemintegratie, waaronder directe API-integratie met adaptermechanismen voor het beheren van meerdere betalingsgateways.
+
+## Dynamic Component Diagram
+
+![Dynamic component diagram](component-code/simme/dynamic-diagram.png)
+
+Dit dynamisch diagram visualiseert de volledige levenscyclus van een betalingstransactie binnen TripTop. De flow begint bij de klant die een betaling initieert en vervolgt via de frontend naar de backend componenten. Het diagram toont hoe:
+
+- De betalingsverwerking wordt gedistribueerd over gespecialiseerde componenten met duidelijke verantwoordelijkheden
+- De BetalingFactory dynamisch de juiste adapter selecteert (PayPal of Stripe) gebaseerd op de gekozen betalingsmethode, wat naadloze integratie mogelijk maakt
+- Externe API's worden aangeroepen via gestandaardiseerde interfaces, wat de ontkoppeling tussen interne en externe systemen bevordert
+- Persistentie van betalingsgegevens wordt gegarandeerd voor auditing en statusbeheer
+
+Deze architectuur biedt een robuuste manier om meerdere betalingsproviders te ondersteunen zonder de kernlogica van het systeem aan te tasten. De genummerde stappen maken de procesflow duidelijk traceerbaar en debugbaar.
+
+## Sequence Diagram
+
+![Sequence](component-code/simme/sequence-diagram.png)
+Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten tijdens het betalingsproces. Het diagram:
+
+- Illustreert de volledige transactionele flow van betalingscreatie tot statusverificatie
+- Toont hoe de betalingscontroller verzoeken coördineert en doorstuurt naar de juiste services
+- Demonstreert de factory-methode voor het dynamisch genereren van de juiste betalingsadapter
+- Laat zien hoe gebruikerstransacties worden afgehandeld, inclusief doorverwijzing naar externe betalingsproviders en terugkeer naar het platform
+
+Het diagram biedt een gedetailleerd overzicht van zowel de normale betalingsflow als alternatieve paden zoals annuleringen en statuscontroles. Deze methodische weergave verzekert dat alle mogelijke interacties correct worden geïmplementeerd.
+
+## Class Diagram
+
+![Component Diagram](component-code/simme/class-diagram.png)
+
+Het klassendiagram definieert de structurele elementen en hun relaties binnen het betalingssysteem. De kern van het ontwerp is:
+
+- De BetalingAdapter interface die een uniforme toegang tot verschillende betalingsproviders mogelijk maakt
+- Concrete adapter-implementaties (StripeAdapter, PayPalAdapter) die provider-specifieke functionaliteit inkapselen
+- Een BetalingFactory die verantwoordelijk is voor het creëren van de juiste adapter, waardoor conditionele logica wordt gecentraliseerd
+- Data-objecten voor gestandaardiseerde communicatie (BetalingsVerzoek, BetalingsResultaat)
+- Statusbeheer via enumeraties voor consistente statusrepresentatie
+
+Deze architectuur maakt het toevoegen van nieuwe betalingsmethoden eenvoudig door simpelweg een nieuwe adapter te implementeren die voldoet aan de interface, zonder wijzigingen aan de kerncode.
 
 ## 7. Software Architecture
 
@@ -107,7 +324,7 @@ De container diagram toont in meer detail hoe Triptop integreert met de verschil
 We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
 
 
-### 2.2 Dynamische Container Diagram
+### 7.2 Dynamische Container Diagram
 ### 7.2.1  Inloggen
 
 ![Inloggen](dynamisch-container-diagrammen/inlog-dynamisch-diagram.png)
@@ -157,19 +374,6 @@ Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserverings
 
 Herstart van het proces:
 Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
-
-
-
-###     7.2. Components
-
-[Ahmed Component & Code](component-code/ahmed/ReadMe.MD)
-> [!IMPORTANT]
-> Voeg toe: Component Diagram plus een Dynamic Diagram van een aantal scenario's inclusief begeleidende tekst.
-
-###     7.3. Design & Code
-
-> [!IMPORTANT]
-> Voeg toe: Per ontwerpvraag een Class Diagram plus een Sequence Diagram van een aantal scenario's inclusief begeleidende tekst.
 
 ## 8. Architectural Decision Records
 
@@ -504,6 +708,7 @@ Gevolgen
 
 
 ---
+
 
 ## 10. API Mapping
 

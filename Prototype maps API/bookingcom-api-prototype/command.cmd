@@ -1,7 +1,7 @@
 //Voor locatie:Locatie
 
 
-Input locatie amsterdam
+Input locatie london
 curl --request GET
 	--url 'https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=london'
 	--header 'x-rapidapi-host: booking-com15.p.rapidapi.com'
