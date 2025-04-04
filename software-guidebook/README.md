@@ -250,6 +250,63 @@ De betalingen worden uiteraard ook netjes opgeslagen in de database.
 
 Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
 
+## Toelichting Simme
+
+Hoe kunnen we verschillende betalingssystemen integreren voor de verschillende bouwstenen?
+
+## Component Diagram
+![Component Diagram](component-code/simme/component-diagram.png)
+Dit diagram toont de structurele organisatie en afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
+
+- Een duidelijke scheiding tussen frontend en backend-componenten, met een API-grens via de BetalingController
+- Hoe de BetalingService als orchestrator fungeert voor het betalingsproces
+- De interne opdeling in gespecialiseerde adapters voor elke betalingsprovider
+- De BetalingFactory als centraal punt voor het selecteren van de juiste adapter
+- De connectie met externe betalingssystemen via gestandaardiseerde interfaces
+
+Deze componentarchitectuur vormt een "payment hub"-benadering, waarbij een gespecialiseerde laag tussen de kernbusiness-logica en externe betalingsproviders wordt geplaatst. Dit patroon biedt flexibiliteit voor het uitbreiden met nieuwe betalingsmethoden en isoleert de impact van wijzigingen in externe systemen.
+
+De gekozen architectuur implementeert de aanbevolen praktijken voor betalingssysteemintegratie, waaronder directe API-integratie met adaptermechanismen voor het beheren van meerdere betalingsgateways.
+
+## Dynamic Component Diagram
+
+![Dynamic component diagram](component-code/simme/dynamic-diagram.png)
+
+Dit dynamisch diagram visualiseert de volledige levenscyclus van een betalingstransactie binnen TripTop. De flow begint bij de klant die een betaling initieert en vervolgt via de frontend naar de backend componenten. Het diagram toont hoe:
+
+- De betalingsverwerking wordt gedistribueerd over gespecialiseerde componenten met duidelijke verantwoordelijkheden
+- De BetalingFactory dynamisch de juiste adapter selecteert (PayPal of Stripe) gebaseerd op de gekozen betalingsmethode, wat naadloze integratie mogelijk maakt
+- Externe API's worden aangeroepen via gestandaardiseerde interfaces, wat de ontkoppeling tussen interne en externe systemen bevordert
+- Persistentie van betalingsgegevens wordt gegarandeerd voor auditing en statusbeheer
+
+Deze architectuur biedt een robuuste manier om meerdere betalingsproviders te ondersteunen zonder de kernlogica van het systeem aan te tasten. De genummerde stappen maken de procesflow duidelijk traceerbaar en debugbaar.
+
+## Sequence Diagram
+
+![Sequence](component-code/simme/sequence-diagram.png)
+Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten tijdens het betalingsproces. Het diagram:
+
+- Illustreert de volledige transactionele flow van betalingscreatie tot statusverificatie
+- Toont hoe de betalingscontroller verzoeken coördineert en doorstuurt naar de juiste services
+- Demonstreert de factory-methode voor het dynamisch genereren van de juiste betalingsadapter
+- Laat zien hoe gebruikerstransacties worden afgehandeld, inclusief doorverwijzing naar externe betalingsproviders en terugkeer naar het platform
+
+Het diagram biedt een gedetailleerd overzicht van zowel de normale betalingsflow als alternatieve paden zoals annuleringen en statuscontroles. Deze methodische weergave verzekert dat alle mogelijke interacties correct worden geïmplementeerd.
+
+## Class Diagram
+
+![Component Diagram](component-code/simme/class-diagram.png)
+
+Het klassendiagram definieert de structurele elementen en hun relaties binnen het betalingssysteem. De kern van het ontwerp is:
+
+- De BetalingAdapter interface die een uniforme toegang tot verschillende betalingsproviders mogelijk maakt
+- Concrete adapter-implementaties (StripeAdapter, PayPalAdapter) die provider-specifieke functionaliteit inkapselen
+- Een BetalingFactory die verantwoordelijk is voor het creëren van de juiste adapter, waardoor conditionele logica wordt gecentraliseerd
+- Data-objecten voor gestandaardiseerde communicatie (BetalingsVerzoek, BetalingsResultaat)
+- Statusbeheer via enumeraties voor consistente statusrepresentatie
+
+Deze architectuur maakt het toevoegen van nieuwe betalingsmethoden eenvoudig door simpelweg een nieuwe adapter te implementeren die voldoet aan de interface, zonder wijzigingen aan de kerncode.
+
 ## 7. Software Architecture
 
 ###     7.1. Containers
@@ -317,12 +374,6 @@ Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserverings
 
 Herstart van het proces:
 Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
-
-
-
-
-
-
 
 ## 8. Architectural Decision Records
 
