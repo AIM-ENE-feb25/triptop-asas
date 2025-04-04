@@ -21,7 +21,6 @@ Het is belangrijk om een goede keuze te maken op welke plek een interface geimpl
 
 #### **Beslissing**
 Er is besloten om de klasse BoekingOverzichtService de interfacde BoekingInterface te laten implementeren.
-Dit zorgt ervoor dat 
 
 
 #### **Consequenties**
