@@ -20,10 +20,7 @@ System_Boundary(triptop, "Boeking Systeem") {
   Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
   Component(wireMockAdapterV2, "WireMock Adapter v2", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v2)")
 
-  Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
-  Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
-  Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
-  Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
+  Component(paymentAdapter, "Betaling Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
 
   Component(betalingController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
 
@@ -74,7 +71,6 @@ Rel(frontend, betalingController, "Stuurt betalingsverzoeken", "HTTPS")
 ' Relaties tussen containers binnen TripTop
 Rel(frontend, controller, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
 Rel(frontend, loginController, "Stuurt inlogverzoeken", "HTTPS")
-Rel(frontend,paymentController, "")
 Rel(controller, boeking_overzicht_service, "Geeft verzoeken door aan de service", "REST")
 Rel(boeking_overzicht_service, booking_com_adapter, "Vraagt overnachtingsmogelijkheden op", "REST")
 ' Relaties backend naar externe systemen
@@ -85,10 +81,8 @@ Rel(boeking_overzicht_service, boeking_repository, "Geeft boeking mee aan de rep
 Rel(boeking_repository, database, "Slaat boekingen op", "JSON/HTTPS")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "JDBC/SQL")
 Rel(betalingController, betalingService, "Stuurt betalingsverzoeken", "JSON/HTTP")
-Rel(paymentController, paymentService, "Stuurt betalingsverzoeken", "JSON/HTTPS")
-Rel(paymentRepository,database,"Leest/ Schrijft naar")
-Rel(paymentService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
-Rel(paymentService,paymentRepository, "Leest/schrijft betalingsdata")
+Rel(betalingService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
+Rel(betalingService,paymentRepository, "Leest/schrijft betalingsdata")
 Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "")
 Rel(betalingRepository, database, "Leest/Schrijft naar", "")
