@@ -87,7 +87,10 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 
 ## 6. Ontwerpvragen
 
-### 6.1 Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat een wijziging in de API van een externe service niet leidt tot een wijziging in de front-end maar flexibel kan worden opgevangen door de back-end?
+## Toelichting Ahmed
+
+### Ontwerpvraag
+Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat een wijziging in de API van een externe service niet leidt tot een wijziging in de front-end maar flexibel kan worden opgevangen door de back-end?
 ### Context
 
 De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd is op de WireMock API. Gebruikers loggen in via deze externe service, en de applicatie haalt daarvoor een token op en controleert de toegangsrechten via een "check" endpoint.
@@ -206,6 +209,104 @@ De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd 
   - **AuthCheckResponse:** Bevat de toegangsstatus (access) en de rol (role) na het uitvoeren van de check.
 
 ---
+## Toelichting Amine
+### ontwerpvraag
+Ik heb voor dit project gekozen voor de ontwerpvraag: Hoe zorg je ervoor dat je makkelijk de ene externe service kan vervangen door een andere die ongeveer hetzelfde doet?
+Ik vond deze vraag interessant omdat ik in mijn project met verschillende externe services moet werken en het belangrijk is dat ik deze makkelijk kan vervangen zonder dat dit invloed heeft op de rest van de applicatie.
+
+### Bijpassend design pattern
+Het design pattern waar ik voor gekozen heb is het Adapter pattern. Dit pattern maakt het mogelijk om de communicatie met externe services op een uniforme manier te organiseren. Door gebruik te maken van adapters kan ik verschillende externe services integreren zonder dat dit invloed heeft op de rest van de applicatie. Dit zorgt ervoor dat ik makkelijk kan switchen tussen verschillende services zonder dat ik de rest van de applicatie hoef aan te passen.
+
+Ik heb voor dit project meerdere design patterns overwogen, maar uiteindelijk gekozen voor het Adapter pattern omdat dit het beste aansluit bij mijn ontwerpvraag. Het Strategy Pattern bijvoorbeeld zou ook een optie zijn, maar dit zou meer complexiteit met zich meebrengen dan nodig is voor dit project. Het Adapter pattern is eenvoudig te implementeren en zorgt ervoor dat ik makkelijk kan switchen tussen verschillende externe services zonder dat dit invloed heeft op de rest van de applicatie.
+
+In dit geval maak ik gebruik van de Paypal API en de Stripe API. Beide APIs hebben verschillende endpoints en vereisen verschillende parameters, maar door gebruik te maken van adapters kan ik deze verschillen opvangen en de communicatie met de externe services op een uniforme manier organiseren.
+
+### Design Principle
+Ik heb ervoor gekozen om het Dependency Inversion Principle (DIP) toe te passen in mijn ontwerp. Dit principe stelt dat hoog-niveau modules niet afhankelijk moeten zijn van laag-niveau modules, maar beide afhankelijk moeten zijn van abstracties. Dit betekent dat ik de adapters en de service moet scheiden, zodat de service niet afhankelijk is van een specifieke adapter, maar alleen van de abstractie (de PaymentPort). Hierdoor kan ik makkelijk switchen tussen verschillende adapters zonder dat dit invloed heeft op de rest van de applicatie.
+
+
+### Component diagram
+![component diagram](component-code/amine/Component%20diagram.png)
+
+Hierboven zie je mijn component diagram. Ik heb in dit geval alleen het gedeelte van de betalingen gemaakt.
+Wat goed is im in het achterhoofd te houden is dat er wel sprake is van een payment Port, maar ik deze niet heb meegenomen omdat deze in de Service zit.
+Verder toon ik in dit diagram alleen de stripe adapter. De bedoeling is dat ik de stripe adapter en de paypal adapter gemakkelijk moet kunnen omwisselen.
+
+### Dynamic component diagram
+![Dynamic component diagram](component-code/amine/Dynamic Component%20diagram.png)
+
+Hierboven zie je mijn dynamische component diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
+
+
+### code diagram
+![code diagram](component-code/amine/Code%20diagram.png)
+
+Hierboven zie je mijn code diagram. Hier ga ik specifiek in op de technische zaken. Ik heb voor dit prototype goed gekeken naar wat de gemene deler was voor het afhandelen van een betaling voor de stripe en paypal API. In beide gevallen moest er eerst een "order" gemaakt worden die vervolgens geaccepteerd kan worden. Ik heb de functies voor het maken van de order en het accepteren van de order in een "PaymentPort" gezet. Dit zorgt ervoor dat ik deze functies makkelijk kan implementeren in de adapters voor de verschillende externe services.
+Hierdoor kan ik door middel van het aangeven in de properties gemakkelijk omschakelen van Paypal naar Stripe.
+De betalingen worden uiteraard ook netjes opgeslagen in de database.
+
+### sequence diagram
+![sequence diagram](component-code/amine/Sequence%20diagram.png)
+
+Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
+
+## Toelichting Simme
+
+Hoe kunnen we verschillende betalingssystemen integreren voor de verschillende bouwstenen?
+
+## Component Diagram
+![Component Diagram](component-code/simme/component-diagram.png)
+Dit diagram toont de structurele organisatie en afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
+
+- Een duidelijke scheiding tussen frontend en backend-componenten, met een API-grens via de BetalingController
+- Hoe de BetalingService als orchestrator fungeert voor het betalingsproces
+- De interne opdeling in gespecialiseerde adapters voor elke betalingsprovider
+- De BetalingFactory als centraal punt voor het selecteren van de juiste adapter
+- De connectie met externe betalingssystemen via gestandaardiseerde interfaces
+
+Deze componentarchitectuur vormt een "payment hub"-benadering, waarbij een gespecialiseerde laag tussen de kernbusiness-logica en externe betalingsproviders wordt geplaatst. Dit patroon biedt flexibiliteit voor het uitbreiden met nieuwe betalingsmethoden en isoleert de impact van wijzigingen in externe systemen.
+
+De gekozen architectuur implementeert de aanbevolen praktijken voor betalingssysteemintegratie, waaronder directe API-integratie met adaptermechanismen voor het beheren van meerdere betalingsgateways.
+
+## Dynamic Component Diagram
+
+![Dynamic component diagram](component-code/simme/dynamic-diagram.png)
+
+Dit dynamisch diagram visualiseert de volledige levenscyclus van een betalingstransactie binnen TripTop. De flow begint bij de klant die een betaling initieert en vervolgt via de frontend naar de backend componenten. Het diagram toont hoe:
+
+- De betalingsverwerking wordt gedistribueerd over gespecialiseerde componenten met duidelijke verantwoordelijkheden
+- De BetalingFactory dynamisch de juiste adapter selecteert (PayPal of Stripe) gebaseerd op de gekozen betalingsmethode, wat naadloze integratie mogelijk maakt
+- Externe API's worden aangeroepen via gestandaardiseerde interfaces, wat de ontkoppeling tussen interne en externe systemen bevordert
+- Persistentie van betalingsgegevens wordt gegarandeerd voor auditing en statusbeheer
+
+Deze architectuur biedt een robuuste manier om meerdere betalingsproviders te ondersteunen zonder de kernlogica van het systeem aan te tasten. De genummerde stappen maken de procesflow duidelijk traceerbaar en debugbaar.
+
+## Sequence Diagram
+
+![Sequence](component-code/simme/sequence-diagram.png)
+Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten tijdens het betalingsproces. Het diagram:
+
+- Illustreert de volledige transactionele flow van betalingscreatie tot statusverificatie
+- Toont hoe de betalingscontroller verzoeken coördineert en doorstuurt naar de juiste services
+- Demonstreert de factory-methode voor het dynamisch genereren van de juiste betalingsadapter
+- Laat zien hoe gebruikerstransacties worden afgehandeld, inclusief doorverwijzing naar externe betalingsproviders en terugkeer naar het platform
+
+Het diagram biedt een gedetailleerd overzicht van zowel de normale betalingsflow als alternatieve paden zoals annuleringen en statuscontroles. Deze methodische weergave verzekert dat alle mogelijke interacties correct worden geïmplementeerd.
+
+## Class Diagram
+
+![Component Diagram](component-code/simme/class-diagram.png)
+
+Het klassendiagram definieert de structurele elementen en hun relaties binnen het betalingssysteem. De kern van het ontwerp is:
+
+- De BetalingAdapter interface die een uniforme toegang tot verschillende betalingsproviders mogelijk maakt
+- Concrete adapter-implementaties (StripeAdapter, PayPalAdapter) die provider-specifieke functionaliteit inkapselen
+- Een BetalingFactory die verantwoordelijk is voor het creëren van de juiste adapter, waardoor conditionele logica wordt gecentraliseerd
+- Data-objecten voor gestandaardiseerde communicatie (BetalingsVerzoek, BetalingsResultaat)
+- Statusbeheer via enumeraties voor consistente statusrepresentatie
+
+Deze architectuur maakt het toevoegen van nieuwe betalingsmethoden eenvoudig door simpelweg een nieuwe adapter te implementeren die voldoet aan de interface, zonder wijzigingen aan de kerncode.
+
 ## 7. Software Architecture
 
 ###     7.1. Containers
@@ -273,12 +374,6 @@ Ten slotte stuurt de Backend een definitieve bevestiging, inclusief reserverings
 
 Herstart van het proces:
 Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, omdat de data pas wordt opgeslagen in de database nadat de betaling is afgerond.
-
-
-
-
-
-
 
 ## 8. Architectural Decision Records
 

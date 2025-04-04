@@ -2,6 +2,7 @@ package Triptop.Applicatie.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -32,14 +33,14 @@ public class BetalingController {
     }
 
     @GetMapping("/success")
-    public String handlePayPalSuccess(@RequestParam String paymentId, @RequestParam String PayerID) {
+    public RedirectView handlePayPalSuccess(@RequestParam String betalingId, @RequestParam String status) {
         // Execute/capture the payment here
-        return "redirect:/betaling/status?betalingId=" + paymentId;
+        return new RedirectView("/betaling/status?betalingId=" + betalingId);
     }
 
     @GetMapping("/cancel")
-    public String handlePayPalCancel() {
-        return "redirect:/";
+    public RedirectView handlePayPalCancel() {
+        return new RedirectView("/");
     }
 
 }

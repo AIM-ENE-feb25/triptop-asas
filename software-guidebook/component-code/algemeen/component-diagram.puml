@@ -1,0 +1,88 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component diagram van TripTop voor het TripTop systeem
+
+Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
+
+System_Boundary(triptop, "Boeking Systeem") {
+  Component(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
+  Component(boeking_overzicht_service, BoekingOverzichtService, "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
+  Component(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
+  Component(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
+  Component(intern_boeking_systeem, "Intern boekingssysteem", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
+
+  Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+  Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+  Component(loginPort, "AuthAdapter", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+  Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
+
+  Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
+  Component(wireMockAdapterV2, "WireMock Adapter v2", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v2)")
+
+  Component(paymentAdapter, "Betaling Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
+
+  Component(betalingController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
+
+  Component(betalingService, "Betaling Service", "Spring Service", "Orkestreert betalingsprocessen")
+
+  Component(stripeAdapter, "Stripe Adapter", "Implementation", "Specifieke implementatie voor Stripe")
+  Component(paypalAdapter, "PayPal Adapter", "Implementation", "Specifieke implementatie voor PayPal")
+
+  Component(paymentFactory, "Betaling Factory", "Factory", "Creëert de juiste betalingsadapter")
+
+  Component(betalingRepository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
+
+  Rel(betalingService, paymentFactory, "Creëert", "Method Call")
+  Rel(paymentFactory, stripeAdapter, "Creëert indien nodig", "Instantiation")
+  Rel(paymentFactory, paypalAdapter, "Creëert indien nodig", "Instantiation")
+
+  Rel(betalingService, betalingRepository, "Leest/schrijft", "JDBC")
+
+  Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
+  Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
+  Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
+
+  Rel(loginPort, wireMockAdapterV1, "Implementeert (v1)", "REST/JSON")
+  Rel(loginPort, wireMockAdapterV2, "Implementeert (v2)", "REST/JSON")
+
+}
+
+System_Ext(stripe_api, "Stripe API", "Verwerkt creditcard betalingen")
+System_Ext(paypal_api, "PayPal API", "Verwerkt PayPal betalingen")
+System_Ext(identity_provider, "WireMock API (v1)", "Simuleert centrale identiteitsverificatie en SSO voor v1")
+System_Ext(identity_provider_v2, "WireMock API (v2)", "Simuleert centrale identiteitsverificatie en SSO voor v2")
+System_Ext(payment_provider, "Stripe API", "Faciliteert veilige online betalingstransacties")
+
+Rel(wireMockAdapterV1, identity_provider, "Verifieert inloggegevens", "REST/JSON")
+Rel(wireMockAdapterV2, identity_provider_v2, "Verifieert inloggegevens", "REST/JSON")
+Rel(stripeAdapter, stripe_api, "Communiceert met", "REST/HTTPS")
+Rel(paypalAdapter, paypal_api, "Communiceert met", "REST/HTTPS")
+
+Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")
+ContainerDb(database, "Database", "MSSQL", "Opslag van boekingen")
+
+System_Ext(booking, "Booking API ", "Geeft toegang tot een breed scala aan accommodaties,boekingsmogelijkheden en een netwerk van autoverhuurlocaties en -diensten")
+
+
+' Relaties gebruiker naar containers
+Rel(reiziger, frontend, "Gebruikt via webbrowser")
+Rel(frontend, betalingController, "Stuurt betalingsverzoeken", "HTTPS")
+' Relaties tussen containers binnen TripTop
+Rel(frontend, controller, "Stuurt verzoeken naar backend via REST API (JSON/HTTPS)")
+Rel(frontend, loginController, "Stuurt inlogverzoeken", "HTTPS")
+Rel(controller, boeking_overzicht_service, "Geeft verzoeken door aan de service", "REST")
+Rel(boeking_overzicht_service, booking_com_adapter, "Vraagt overnachtingsmogelijkheden op", "REST")
+' Relaties backend naar externe systemen
+Rel_U(booking_com_adapter, booking, "Vraagt overnachtingsmogelijkheden op via REST API", "JSON/HTTPS")
+Rel(boeking_overzicht_service, intern_boeking_systeem, "Haalt overnachtingsmogelijkheden intern op.", "REST")
+Rel(intern_boeking_systeem, database, "Haalt overnachtingsmogelijkheden op.", "REST")
+Rel(boeking_overzicht_service, boeking_repository, "Geeft boeking mee aan de repository", "REST")
+Rel(boeking_repository, database, "Slaat boekingen op", "JSON/HTTPS")
+Rel(userRepository, database, "Voert CRUD-operaties uit", "JDBC/SQL")
+Rel(betalingController, betalingService, "Stuurt betalingsverzoeken", "JSON/HTTP")
+Rel(betalingService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
+Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
+Rel(userRepository, database, "Voert CRUD-operaties uit", "")
+Rel(betalingRepository, database, "Leest/Schrijft naar", "")
+@enduml

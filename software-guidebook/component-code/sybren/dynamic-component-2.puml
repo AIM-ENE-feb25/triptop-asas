@@ -6,12 +6,12 @@ title Component diagram van TripTop voor het TripTop systeem
 Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
 Person(ondersteuner, "Reis Agent", "Tweedelijns support; helpt reiziger bij vragen")
 
-Container_Boundary(triptop, "Boeking Systeem") {
-    Container(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
-    Container(boeking_overzicht_service, BoekingOverzichtService, "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
-    Container(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
-    Container(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
-    Container(intern_boeking_systeem, "Intern boekingssysteem", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
+System_Boundary(triptop, "Boeking Systeem") {
+    Component(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
+    Component(boeking_overzicht_service, BoekingOverzichtService, "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
+    Component(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
+    Component(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
+    Component(intern_boeking_systeem, "Intern boekingssysteem", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
 }
 
  Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat om reizen te plannen, boeken, beheren en betalen")

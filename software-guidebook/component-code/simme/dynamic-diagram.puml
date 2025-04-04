@@ -1,0 +1,43 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+
+title Dynamisch Diagram - TripTop Betalingsprocesstroom
+
+Person(customer, "Klant", "Iemand die een betaling uitvoert")
+Container(frontend, "Frontend", "React", "Gebruikersinterface")
+
+System_Boundary(backendSystem, "TripTop Backend [Java, Spring Boot]") {
+  Component(paymentController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
+  Component(paymentService, "Betaling Service", "Spring Service", "Orkestreert betalingsprocessen")
+  Component(paymentFactory, "Betaling Factory", "Factory", "Creëert betalingsadapters")
+  Component(paypalAdapter, "PayPal Adapter", "Component", "Specifieke implementatie voor PayPal")
+  Component(stripeAdapter, "Stripe Adapter", "Component", "Specifieke implementatie voor Stripe")
+  Component(repository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
+}
+
+ContainerDb(database, "Database", "MSSQL", "Slaat betalingsgegevens op")
+System_Ext(paypalApi, "PayPal API", "Externe betalingsverwerker")
+System_Ext(stripeApi, "Stripe API", "Externe betalingsverwerker")
+
+Rel(customer, frontend, "1. Initieert betaling", "HTTPS")
+Rel(frontend, paymentController, "2. POST /betaling/add", "JSON/HTTPS")
+Rel(paymentController, paymentService, "3. verwerkBetaling()", "Method Call")
+Rel(paymentService, paymentFactory, "4. createBetalingAdapter()", "Method Call")
+
+Rel(paymentFactory, paypalAdapter, "5a. Creëert indien PayPal geselecteerd", "Instantiation")
+Rel(paymentFactory, stripeAdapter, "5b. Creëert indien Stripe geselecteerd", "Instantiation")
+
+Rel(paypalAdapter, paypalApi, "6a. API aanroep", "REST/HTTPS")
+Rel(stripeAdapter, stripeApi, "6b. API aanroep", "REST/HTTPS")
+
+Rel(paypalApi, paypalAdapter, "7a. Retourneert betalings-URL/details", "REST/HTTPS")
+Rel(stripeApi, stripeAdapter, "7b. Retourneert betalings-URL/details", "REST/HTTPS")
+
+Rel(paymentService, repository, "8. save(betaling)", "Method Call")
+Rel(repository, database, "9. Persisteert betalingsgegevens", "JDBC/SQL")
+
+Rel(paymentService, paymentController, "10. Retourneert BetalingsResultaat", "Return")
+Rel(paymentController, frontend, "11. Retourneert redirect URL", "JSON/HTTPS")
+Rel(frontend, customer, "12. Doorverwijst naar betalingsprovider", "HTTPS")
+
+@enduml

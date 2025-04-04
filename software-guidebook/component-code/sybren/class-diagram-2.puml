@@ -32,6 +32,7 @@ class BoekingRepository {
 class BoekingOverzichtService {
     - BoekingRepository boekingRepository
     - BookingComAdapter bookingComAdapter
+
     - InternBoekingSysteem internBoekingSysteem
     - haalOvernachtingenOp(): List<Overnachting>
     - slaBoekingOp(): Boeking
