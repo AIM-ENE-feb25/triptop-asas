@@ -136,6 +136,8 @@ De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd 
     </response>
     ```
 
+Dit heb ik verantwoord in mijn [ADR](#adr-007-gebruik-van-het-adapter-pattern-voor-inloggen)
+
 ### Design Patterns 
 
 
