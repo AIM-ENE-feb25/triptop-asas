@@ -11,7 +11,7 @@ Het is belangrijk om een goede keuze te maken op welke plek een interface geimpl
 |----------------------------|:---------------------:|:------------------------:|:---------------------------------------------:|-----------------------------|
 | **Afhankelijkheid**        |           -           |            -             |                       +                       | +                           |
 | **Code duplicatie**        |                       |                          |                       -                       | +                           | 
-| **Makkelijk uitbreidbaar** |           -           |            -             |                      ++                       | +                           |
+| **Makkelijk uitbreidbaar** |           -           |            -             |                       -                       | -                           |
 
 #### **Alternatieven**
 - implementatie BookingComAdapter: zorgt ervoor dat InternBoekingSysteem afhankelijk wordt BookingComAdapter
@@ -21,7 +21,13 @@ Het is belangrijk om een goede keuze te maken op welke plek een interface geimpl
 
 #### **Beslissing**
 Er is besloten om de klasse BoekingOverzichtService de interfacde BoekingInterface te laten implementeren.
-Dit zorgt ervoor dat de BookingComAdapter en InterneBoekingSysteem van elkaar afhankelijk worden
+Dit zorgt ervoor dat 
 
 
 #### **Consequenties**
+
+##### Voordelen
+- De BookingComAdapter en InterneBoekingSysteem niet van elkaar afhankelijk worden
+
+##### Nadelen
+- Elke keer als er een nieuwe klasse wordt toegevoegd, moet de interface aangepast worden.
