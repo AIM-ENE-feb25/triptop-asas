@@ -27,7 +27,10 @@ Dit zorgt ervoor dat
 #### **Consequenties**
 
 ##### Voordelen
-- De BookingComAdapter en InterneBoekingSysteem niet van elkaar afhankelijk worden
+- De BookingComAdapter en InterneBoekingSysteem niet direct van elkaar afhankelijk worden
+- Voorkomt code duplicatie, waardoor onderhouden van het systeem eenvoudiger wordt.
+- Betere scheiding van afhankelijkheden
 
 ##### Nadelen
 - Elke keer als er een nieuwe klasse wordt toegevoegd, moet de interface aangepast worden.
+- Extra abastractie laag kan het systeem complexer maken.
