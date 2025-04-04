@@ -30,7 +30,7 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 * **Identity Provider** (WireMock): Zorgt voor centrale aanmelding zonder extra account.
 * **BetalingsProvider** (Stripe API): Verwerkt betalingen voor boekingen.
 
-We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
+We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.  Als er een extra functionaliteit voor de reisagent komt zal hij toegevoegd worden aan het context diagram.
 
 ## 3. Functional Overview
 
