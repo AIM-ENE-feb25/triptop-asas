@@ -14,7 +14,7 @@ System_Boundary(triptop, "Boeking Systeem") {
 
   Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
   Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
-  Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+  Component(loginPort, "AuthAdapter", "Interface", "Definieert een stabiel contract voor externe authenticatie")
   Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
 
   Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
@@ -82,7 +82,6 @@ Rel(boeking_repository, database, "Slaat boekingen op", "JSON/HTTPS")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "JDBC/SQL")
 Rel(betalingController, betalingService, "Stuurt betalingsverzoeken", "JSON/HTTP")
 Rel(betalingService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
-Rel(betalingService,paymentRepository, "Leest/schrijft betalingsdata")
 Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "")
 Rel(betalingRepository, database, "Leest/Schrijft naar", "")
