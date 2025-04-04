@@ -14,7 +14,7 @@ Isolatie van externe afhankelijkheden in specifieke adapters
 
 2. Interne Systeemintegratie
 
-De BetalingService communiceert met TripService en UserService om noodzakelijke gegevens te verkrijgen
+De BetalingService communiceert met de factory
 
 De services werken met hun eigen repositories voor persistentie
 
@@ -51,6 +51,10 @@ Nieuwe betalingsmethoden kunnen worden toegevoegd zonder de kerncode aan te pass
 BetalingController → BetalingService → BetalingAdapter: duidelijke scheiding van verantwoordelijkheden
 
 Data-objecten (BetalingsVerzoek, BetalingsResultaat, Betaling) zorgen voor een duidelijke dataflow
+
+![Dynamic component diagram](dynamic-diagram.png)
+
+![Sequence](sequence-diagram.png)
 
 ## Conclusie
 
