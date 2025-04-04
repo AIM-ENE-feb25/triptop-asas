@@ -32,6 +32,7 @@ Het onderstaande diagram toont de context van Triptop, inclusief de gebruikers e
 
 We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.  Als er een extra functionaliteit voor de reisagent komt zal hij toegevoegd worden aan het context diagram.
 
+We gebruiken als betalingsprovider Stripe. Dit is verantwoord in onze [Stripe ADR](#adr-001-keuze-van-payment-service-provider-psp)
 ## 3. Functional Overview
 
 Om de belangrijkste features toe te lichten zijn er user stories en twee domain stories gemaakt en een overzicht van het domein in de vorm van een domeinmodel. Op deze plek staat typisch een user story map maar die ontbreekt in dit voorbeeld.
@@ -91,7 +92,6 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 
 ### Ontwerpvraag
 Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat een wijziging in de API van een externe service niet leidt tot een wijziging in de front-end maar flexibel kan worden opgevangen door de back-end?
-### Context
 
 De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd is op de WireMock API. Gebruikers loggen in via deze externe service, en de applicatie haalt daarvoor een token op en controleert de toegangsrechten via een "check" endpoint.
 
@@ -136,30 +136,32 @@ De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd 
     </response>
     ```
 
-### Design Patterns en Design Principles
+### Design Patterns 
 
 
-1. **Adapter Pattern:**
+**Adapter Pattern:**
 - We hebben een uniforme interface (bijvoorbeeld `AuthAdapter`) gedefinieerd die twee concrete implementaties heeft:
   - **WireMockAuthAdapterV1:** voor de oude API.
   - **WireMockAuthAdapterV2:** voor de nieuwe API.
 - Beide adapters bieden dezelfde methodes (bijv. `login()` en `check()`) en retourneren altijd een uniform DTO (bijvoorbeeld `LoginResponse` en `CheckResponse`).
 - Hierdoor hoeft de controller (en dus de front-end) niets te weten van de verschillen tussen de oude en nieuwe API. Alleen de back-end adapter past zich aan op basis van de configuratie of op basis van de tokenlengte (bijvoorbeeld: bestaande gebruikers blijven via V1, nieuwe gebruikers via V2).
 
-2. **Single Responsibility Principle (SRP):**
+### Design Principles
+
+1. **Single Responsibility Principle (SRP):**
 - Elke klasse heeft één verantwoordelijkheid. Zo beheert de adapter de communicatie met de externe API en vertaalt deze response naar de interne DTO's.
 - De service laag beheert de businesslogica en de gebruikerssessies, terwijl de controller zich alleen richt op het ontvangen en retourneren van HTTP-verzoeken.
 
-3. **Open/Closed Principle (OCP):**
+2. **Open/Closed Principle (OCP):**
 - De back-end is zo opgezet dat deze openstaat voor uitbreiding (bijvoorbeeld voor een derde versie van de API) zonder dat bestaande code aangepast hoeft te worden. Nieuwe adapters kunnen eenvoudig toegevoegd worden.
 
-4. **Dependency Inversion Principle (DIP):**
+3. **Dependency Inversion Principle (DIP):**
 - De controller en service laag werken tegen de abstracte interface (`AuthAdapter`) in plaats van tegen concrete implementaties. Hierdoor kunnen we de concrete implementatie (V1 of V2) eenvoudig wisselen zonder dat de hogere lagen (controller, service) gewijzigd hoeven te worden.
 
-#### Component Diagram
+### Component Diagram
 ![Component Diagram](component-code/ahmed/component-Component_Diagram___TripTop_Backend.png)
 
-#### Toelichting Component Diagram
+
 
 - **Frontend:**  
   De gebruikersinterface die de gebruiker in staat stelt om reizen te plannen en te beheren.
@@ -178,13 +180,20 @@ De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd 
 - **Database:**  
   Een MSSQL-database die gebruikers informatie beheert.
 
----
+Ik heb besloten om WireMock Adapter v1 en v2 op te nemen in het component diagram, omdat ik het duidelijk kan maken via het diagram dat er gebruik gemaakt wordt van een adapter.
 
-#### Code Diagram – TripTop Applicatie
+---
+### Dynamic Diagram
+![Dynamic Diagram](component-code/ahmed/dynamic-Dynamic_Diagram.png)
+
+Dit is een dynamisch diagram voor het inloggen met Wiremock V2.
+LoginResponse is te vinden in het Code Diagram.
+
+### Code Diagram
 
 
 ![Code Diagram](component-code/ahmed/login-Login_Component_Class_Diagram.png)
-#### Toelichting Code Diagram
+
 
 - **AuthController:**  
   De controller ontvangt HTTP-verzoeken (login en check) en roept de AuthService aan om de businesslogica uit te voeren. Hij ontvangt en retourneert DTO's (AuthLoginRequest/Response en AuthCheckRequest/Response).
@@ -208,13 +217,18 @@ De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd 
   - **AuthCheckRequest:** Bevat gebruikersnaam en de application voor de check.
   - **AuthCheckResponse:** Bevat de toegangsstatus (access) en de rol (role) na het uitvoeren van de check.
 
+
+### Sequence Diagram
+![Sequence Diagram](component-code/ahmed/sequence.png)
+
+
 ---
 ## Toelichting Amine
-### ontwerpvraag
+### Ontwerpvraag
 Ik heb voor dit project gekozen voor de ontwerpvraag: Hoe zorg je ervoor dat je makkelijk de ene externe service kan vervangen door een andere die ongeveer hetzelfde doet?
 Ik vond deze vraag interessant omdat ik in mijn project met verschillende externe services moet werken en het belangrijk is dat ik deze makkelijk kan vervangen zonder dat dit invloed heeft op de rest van de applicatie.
 
-### Bijpassend design pattern
+### Design pattern
 Het design pattern waar ik voor gekozen heb is het Adapter pattern. Dit pattern maakt het mogelijk om de communicatie met externe services op een uniforme manier te organiseren. Door gebruik te maken van adapters kan ik verschillende externe services integreren zonder dat dit invloed heeft op de rest van de applicatie. Dit zorgt ervoor dat ik makkelijk kan switchen tussen verschillende services zonder dat ik de rest van de applicatie hoef aan te passen.
 
 Ik heb voor dit project meerdere design patterns overwogen, maar uiteindelijk gekozen voor het Adapter pattern omdat dit het beste aansluit bij mijn ontwerpvraag. Het Strategy Pattern bijvoorbeeld zou ook een optie zijn, maar dit zou meer complexiteit met zich meebrengen dan nodig is voor dit project. Het Adapter pattern is eenvoudig te implementeren en zorgt ervoor dat ik makkelijk kan switchen tussen verschillende externe services zonder dat dit invloed heeft op de rest van de applicatie.
@@ -226,27 +240,27 @@ Ik heb ervoor gekozen om het Dependency Inversion Principle (DIP) toe te passen 
 
 
 ### Component diagram
-![component diagram](component-code/amine/Component%20diagram.png)
+![component diagram](component-code/amine/component-diagram.png)
 
 Hierboven zie je mijn component diagram. Ik heb in dit geval alleen het gedeelte van de betalingen gemaakt.
 Wat goed is im in het achterhoofd te houden is dat er wel sprake is van een payment Port, maar ik deze niet heb meegenomen omdat deze in de Service zit.
 Verder toon ik in dit diagram alleen de stripe adapter. De bedoeling is dat ik de stripe adapter en de paypal adapter gemakkelijk moet kunnen omwisselen.
 
 ### Dynamic component diagram
-![Dynamic component diagram](component-code/amine/Dynamic Component%20diagram.png)
+![Dynamic component diagram](component-code/amine/Dynamic-component-diagram.png)
 
 Hierboven zie je mijn dynamische component diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
 
 
-### code diagram
-![code diagram](component-code/amine/Code%20diagram.png)
+### Code diagram
+![code diagram](component-code/amine/code-diagram.png)
 
 Hierboven zie je mijn code diagram. Hier ga ik specifiek in op de technische zaken. Ik heb voor dit prototype goed gekeken naar wat de gemene deler was voor het afhandelen van een betaling voor de stripe en paypal API. In beide gevallen moest er eerst een "order" gemaakt worden die vervolgens geaccepteerd kan worden. Ik heb de functies voor het maken van de order en het accepteren van de order in een "PaymentPort" gezet. Dit zorgt ervoor dat ik deze functies makkelijk kan implementeren in de adapters voor de verschillende externe services.
 Hierdoor kan ik door middel van het aangeven in de properties gemakkelijk omschakelen van Paypal naar Stripe.
 De betalingen worden uiteraard ook netjes opgeslagen in de database.
 
-### sequence diagram
-![sequence diagram](component-code/amine/Sequence%20diagram.png)
+### Sequence diagram
+![sequence diagram](component-code/amine/Sequence-diagram.png)
 
 Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillende componenten met elkaar communiceren en hoe de adapters de communicatie met de externe services afhandelen.
 
@@ -254,8 +268,9 @@ Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillen
 
 Hoe kunnen we verschillende betalingssystemen integreren voor de verschillende bouwstenen?
 
-## Component Diagram
+### Component Diagram
 ![Component Diagram](component-code/simme/component-diagram.png)
+
 Dit diagram toont de structurele organisatie en afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
 
 - Een duidelijke scheiding tussen frontend en backend-componenten, met een API-grens via de BetalingController
@@ -268,7 +283,7 @@ Deze componentarchitectuur vormt een "payment hub"-benadering, waarbij een gespe
 
 De gekozen architectuur implementeert de aanbevolen praktijken voor betalingssysteemintegratie, waaronder directe API-integratie met adaptermechanismen voor het beheren van meerdere betalingsgateways.
 
-## Dynamic Component Diagram
+### Dynamic Component Diagram
 
 ![Dynamic component diagram](component-code/simme/dynamic-diagram.png)
 
@@ -281,7 +296,7 @@ Dit dynamisch diagram visualiseert de volledige levenscyclus van een betalingstr
 
 Deze architectuur biedt een robuuste manier om meerdere betalingsproviders te ondersteunen zonder de kernlogica van het systeem aan te tasten. De genummerde stappen maken de procesflow duidelijk traceerbaar en debugbaar.
 
-## Sequence Diagram
+### Sequence Diagram
 
 ![Sequence](component-code/simme/sequence-diagram.png)
 Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten tijdens het betalingsproces. Het diagram:
@@ -293,7 +308,7 @@ Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten
 
 Het diagram biedt een gedetailleerd overzicht van zowel de normale betalingsflow als alternatieve paden zoals annuleringen en statuscontroles. Deze methodische weergave verzekert dat alle mogelijke interacties correct worden geïmplementeerd.
 
-## Class Diagram
+### Class Diagram
 
 ![Component Diagram](component-code/simme/class-diagram.png)
 
@@ -307,7 +322,7 @@ Het klassendiagram definieert de structurele elementen en hun relaties binnen he
 
 Deze architectuur maakt het toevoegen van nieuwe betalingsmethoden eenvoudig door simpelweg een nieuwe adapter te implementeren die voldoet aan de interface, zonder wijzigingen aan de kerncode.
 
-### Toelichting Sybren
+## Toelichting Sybren
 
 
 ### Ontwerpvraag
@@ -320,7 +335,7 @@ Een design principe die op dit ontwerp is toegepast, is de Dependency Inversion.
 
 ---
 
-### STATISCHE COMPONENT DIAGRAM
+### Component Diagram
 
 ![Component Diagram](component-code/sybren/component-diagram.png)
 
@@ -332,7 +347,7 @@ Als laatste zie je dat de BoekingOverzichtService BoekingingInterface implemente
 
 ---
 
-### CODE DIAGRAM
+### Code Diagram
 ![](component-code/sybren/class-diagram.png)
 In deze klassendiagram zijn twee domein klassen te zien, namelijk Boeking en Overnachting. Er wordt hier onderscheid gemaakt tussen een boeking en overnachting, omdat deze
 op een andere manier afgehandeld worden. Er is sprake van een overnachting als de reiziger naar mogelijke opties zoekt. Als een bepaalde overnachting gekozen wordt en deze ook geboekt wordt, is er sprake van een boeking.
@@ -341,10 +356,10 @@ op een andere manier afgehandeld worden. Er is sprake van een overnachting als d
 
     
 ---
-### DYNAMISCHE COMPONENT DIAGRAM
+### Dynamic Diagram
 ![](component-code/sybren/dynamische-component-diagram.png)
 
-### SEQUENCE DIAGRAM
+### Sequence Diagram
 ![](component-code/sybren/sequence-diagram-sybren.png)
 
 
@@ -365,6 +380,8 @@ De container diagram toont in meer detail hoe Triptop integreert met de verschil
 
 We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
 
+We hebben voor de backend besloten om Spring boot te gebruiken als framework. Dit is verantwoord in onze [Framework ADR](#adr-003-framework-keuze-voor-triptop-systeem)
+Onze database keuze is verantwoord in onze [Database ADR](#adr-005-database-keuze-voor-triptop-systeem)
 
 ### 7.2 Dynamische Container Diagram
 ### 7.2.1  Inloggen
@@ -504,9 +521,9 @@ Voor het realiseren van een werkend prototype is het essentieel het juiste frame
 
 | **Criteria**               | **Spring Boot** | **Quarkus** | **Micronaut** | **Jakarta EE** | **Vert.x** | **Dropwizard** | **Helidon** |
 |----------------------------|:---------------:|:-----------:|:-------------:|:--------------:|:----------:|:--------------:|:-----------:|
-| **Makkelijk in gebruik**   | ++              | +           | +             | -              | --         | +              | -           |
-| **Opstarttijd**            | -               | ++          | +             | --             | ++         | 0              | +           |
-| **Geheugengebruik**        | -               | ++          | +             | 0              | ++         | 0              | +           |
+| **Makkelijk in gebruik <sup>1</sup>**   | ++              | +           | +             | -              | --         | +              | -           |
+| **Snelheid opstarttijd <sup>2</sup>**         | -               | ++          | +             | --             | ++         | 0              | +           |
+| **Geheugengebruik <sup>3</sup>**       | -               | ++          | +             | 0              | ++         | 0              | +           |
 | **Community & Ecosysteem** | ++              | +           | +             | 0              | -          | 0              | -           |
 | **Team Ervaring**          | ++              | --          | --            | --             | --         | --             | --          |
 
@@ -521,11 +538,13 @@ Wij kiezen voor **Spring Boot** vanwege de uitstekende gebruiksvriendelijkheid, 
 
 #### Bronnen
 
-- Venturelli, I. (2024, December 6). Choosing the right Java microservices framework: Spring Boot, Quarkus, Micronaut, and beyond. Medium. https://medium.com/codex/choosing-the-right-java-microservices-framework-spring-boot-quarkus-micronaut-and-beyond-e53f11704e58
+#### Bronnen
 
-- Chmielarz, M. (2025, March 24). Overview of next-generation Java frameworks. SoftwareMill. https://softwaremill.com/overview-of-next-generation-java-frameworks/
+<sup>1</sup> Johns, R. (n.d.). Want to level up in Java? Use these Java frameworks! Hackr.io. https://hackr.io/blog/java-frameworks
 
-- Dansiviter. (2021, June 27). Opinionated take on Java Microservices Frameworks. DEV Community. https://dev.to/dansiviter/opinionated-take-on-java-microservices-frameworks-4ebh
+<sup>2</sup> Dansiviter. (2021, June 27). Opinionated take on Java Microservices Frameworks. DEV Community. https://dev.to/dansiviter/opinionated-take-on-java-microservices-frameworks-4ebh
+
+<sup>3</sup> 4 Microservice frameworks in comparison, streaming example included. (n.d.). https://blogs.itemis.com/en/4-microservice-frameworks-in-comparsion-example-included
 
 ---
 
@@ -747,6 +766,42 @@ Gevolgen
 - Elke nieuwe externe service zal een aparte adapter vereisen.
 - De adapters kunnen eenvoudiger worden getest, omdat ze een afzonderlijke laag vormen die de communicatie tussen ons systeem en de externe systemen afhandelt.
 
+
+### **ADR-009: Keuze inplementatie BoekingInterface**
+
+#### **Status**
+Geaccepteerd
+
+#### **Context**
+Het is belangrijk om een goede keuze te maken op welke plek een interface geimplementeerd moet worden.
+
+#### **Decision Forces**
+| **Criteria**               | **BookingComAdapter** | **InternBoekingSysteem** | **BoekingComAdpater en InternBoekingSysteem** | **BoekingOverzichtService** | 
+|----------------------------|:---------------------:|:------------------------:|:---------------------------------------------:|-----------------------------|
+| **Afhankelijkheid**        |           -           |            -             |                       +                       | +                           |
+| **Code duplicatie**        |                       |                          |                       -                       | +                           | 
+| **Makkelijk uitbreidbaar** |           -           |            -             |                       -                       | -                           |
+
+#### **Alternatieven**
+- implementatie BookingComAdapter: zorgt ervoor dat InternBoekingSysteem afhankelijk wordt BookingComAdapter
+- implementatie InternBoekingSysteem: zorgt ervoor dat BookingComAdapter afhankelijk wordt van InternBoekingSysteem
+- implementatie BookingComAdapter en InternBoekingSysteem: zorgt ervoor dat de afhankelijkheid er niet is, maar zorgt wel voor code duplicatie.
+- implementatie BoekingOverzichtService: zorgt ervoor dat je code duplicatie voorkomt, er geen afhankelijkheden zijn en dat de code makkelijk uitbreidbaar is.
+
+#### **Beslissing**
+Er is besloten om de klasse BoekingOverzichtService de interfacde BoekingInterface te laten implementeren.
+
+
+#### **Consequenties**
+
+##### Voordelen
+- De BookingComAdapter en InterneBoekingSysteem niet direct van elkaar afhankelijk worden
+- Voorkomt code duplicatie, waardoor onderhouden van het systeem eenvoudiger wordt.
+- Betere scheiding van afhankelijkheden
+
+##### Nadelen
+- Elke keer als er een nieuwe klasse wordt toegevoegd, moet de interface aangepast worden.
+- Extra abastractie laag kan het systeem complexer maken.
 
 
 ---

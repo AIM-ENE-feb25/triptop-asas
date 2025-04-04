@@ -1,32 +1,53 @@
 @startuml
-actor "Gebruiker" as Gebruiker
-participant "AuthController" as Controller
-participant "AuthService" as Service
-participant "AuthAdapter" as Adapter
-participant "Wiremock API" as ExternalAPI
-participant "User:\n user" as User
-database "UserRepository" as Repo
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title Dynamisch Sequence Diagram – TripTop Backend
 
-Gebruiker -> Controller: POST /auth/login\n(AuthLoginRequest: username, password)
-Controller -> Service: login(loginRequest)
-Service -> Adapter: login(username, password)
-Adapter -> ExternalAPI: POST /login\n{username, password}
-ExternalAPI --> Adapter: token (via header/JSON)
-Adapter --> Service:  token
-Service -> Repo: user = findByUsername(username)
-Service ->User: setToken(token)
-Service -> Repo: save(user + token)
-Service --> Controller: LoginResponse(token)
-Controller --> Gebruiker: HTTP 200\n{token}
+actor "Reiziger" as User
+participant "Frontend" as FE
+participant "Login Controller" as LC
+participant "Login Service" as LS
+participant "Auth Adapter" as AA
+participant "UserRepository" as UR
+participant "Database" as DB
+participant "WireMock API (v1)" as WMV1
+participant "WireMock API (v2)" as WMV2
+participant "user:\n User " as user
+User -> FE: Voert inloggegevens in\n(AuthLoginRequest DTO)
+FE -> LC: POST /auth/login\n(AuthLoginRequest)
+LC -> LS: login(loginRequest)
+LS -> AA: login(username, password)
+alt Gebruik WireMock API v1
+  AA -> WMV1: POST /login\n(JSON body: username, password)
+  WMV1 --> AA: JSON response\n{ "token": "abc123def456" }\n
+else Gebruik WireMock API v2
+  AA -> WMV2: POST /login\n(JSON body: username, password)
+  WMV2 --> AA: Response header\n{ token: "v2_abcdefghijklmnop" }\n
+end
+AA --> LS: token
+LS -> UR:user = findByUsername(username)
+LS -> user: setToken(token)
+LS -> UR: save(user)
+UR --> LS: Opslaan bevestigd
+LS --> LC: Retourneer LoginResponse DTO\n{ token }
+LC --> FE: HTTP 200\n(LoginResponse DTO)
+FE --> User: Reiziger is ingelogd
 
-Gebruiker -> Controller: POST /auth/check\n(CheckRequest: username, application, token)
-Controller -> Service: check(token, checkRequest)
-Service -> Adapter: check(token, username, application)
-Adapter -> ExternalAPI: POST /checkAppAccess\n(token in header & JSON body)
-ExternalAPI --> Adapter: XML response\n(voorbeeld: <response><access>allowed</access><role>klant</role></response>)
-Adapter --> Service: return CheckResponse(access, role)
-Service --> Controller: CheckResponse(access, role)
-Controller --> Gebruiker: HTTP 200\n{access, role}
+User -> FE: Start check-access actie\n(CheckRequest DTO)
+FE -> LC: POST /auth/check\n(CheckRequest)
+LC -> LS: check(token, checkRequest)
+LS -> AA: check(token, username, application)
+alt Gebruik WireMock API v1
+  AA -> WMV1: POST /checkAppAccess?token=xxx\n(JSON body: username, application)
+  WMV1 --> AA: JSON response\n{ "access": "allowed", "role": "klant" }
+else Gebruik WireMock API v2
+  AA -> WMV2: POST /checkAppAccess\n(Token in header, JSON body: username, application)
+  WMV2 --> AA: XML response\n<response><access>allowed</access><role>klant</role></response>
+  note right of AA: "De V2 adapter verwerkt de XML response\nen zet deze om naar een CheckResponse DTO"
+end
+AA --> LS: Retourneer CheckResponse DTO
+LS --> LC: Retourneer CheckResponse DTO
+LC --> FE: HTTP 200\n(CheckResponse DTO)
+FE --> User: Toegang: allowed, Rol: klant
 
 
 @enduml

@@ -26,6 +26,7 @@ package "TripTop Applicatie" {
     class WireMockAuthAdapterV2 {
         +login(username: String, password: String): String
         +check(token: String, username: String, application: String): AuthCheckResponse
+        +extractTagValue(xml: String,tagName: String):String
     }
 
     class UserRepository {
