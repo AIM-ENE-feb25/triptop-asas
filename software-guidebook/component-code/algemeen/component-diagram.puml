@@ -6,57 +6,48 @@ title Component diagram van TripTop voor het TripTop systeem
 Person(reiziger, "Reiziger", "Stelt de reis samen, boekt, annuleert, past aan en betaalt")
 
 System_Boundary(triptop, "Boeking Systeem") {
-    Component(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
-    Component(boeking_overzicht_service, BoekingOverzichtService, "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
-    Component(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
-    Component(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
-    Component(intern_boeking_systeem, "Intern boekingssysteem", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
+  Component(controller, "BoekingController", "Java, Spring Boot", "Verwerkt boekingen aanvragen")
+  Component(boeking_overzicht_service, BoekingOverzichtService, "Java, Spring Boot", "Verwerkt boeking aanvragen met intern systeem en externe api")
+  Component(boeking_repository, "BoekingRepository", "Java, Spring Boot", "Slaat boekingen op in de database")
+  Component(booking_com_adapter, "BookingComAdapter", "Java, Spring Boot", "Legt verbinding met Booking.com API")
+  Component(intern_boeking_systeem, "Intern boekingssysteem", "Java, Spring Boot", "Bevat businesslogica voor intern boekingssysteem")
 
-    Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
-    Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
-    Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
-    Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
+  Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
+  Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
+  Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+  Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
 
-    Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
-    Component(wireMockAdapterV2, "WireMock Adapter v2", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v2)")
+  Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")
+  Component(wireMockAdapterV2, "WireMock Adapter v2", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v2)")
 
-    Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
-    Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
-    Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
-    Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
+  Component(paymentController, "Payment Controller", "Spring MVC", "Verwerkt betalingen")
+  Component(paymentService, "Payment Service", "Spring Service", "Doet de businesslogica van de betalingen")
+  Component(paymentRepository, "payment Repository", "Spring Data JPA", "Slaat betalingen op in de database")
+  Component(paymentAdapter, "Payment Service Adapter", "Spring Boot", "Abstracteert externe betalingsdiensten")
 
-    Component(betalingController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
+  Component(betalingController, "Betaling Controller", "Spring MVC", "Verwerkt betalingsverzoeken")
 
-    Component(betalingService, "Betaling Service", "Spring Service", "Orkestreert betalingsprocessen")
-     Component(tripService, "Trip Service", "Spring Service", "Beheert reisgegevens en prijsinformatie")
-     Component(userService, "Gebruiker Service", "Spring Service", "Beheert gebruikersgegevens")
+  Component(betalingService, "Betaling Service", "Spring Service", "Orkestreert betalingsprocessen")
 
-     Component(stripeAdapter, "Stripe Adapter", "Implementation", "Specifieke implementatie voor Stripe")
-     Component(paypalAdapter, "PayPal Adapter", "Implementation", "Specifieke implementatie voor PayPal")
+  Component(stripeAdapter, "Stripe Adapter", "Implementation", "Specifieke implementatie voor Stripe")
+  Component(paypalAdapter, "PayPal Adapter", "Implementation", "Specifieke implementatie voor PayPal")
 
-     Component(paymentFactory, "Betaling Factory", "Factory", "Creëert de juiste betalingsadapter")
+  Component(paymentFactory, "Betaling Factory", "Factory", "Creëert de juiste betalingsadapter")
 
-     Component(tripRepository, "Trip Repository", "Spring Data JPA", "Slaat tripgegevens op")
-     Component(gebruikerRepository, "Gebruiker Repository", "Spring Data JPA", "Slaat gebruikersgegevens op")
-     Component(betalingRepository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
+  Component(betalingRepository, "Betaling Repository", "Spring Data JPA", "Slaat betalingstransacties op")
 
-     Rel(betalingService, paymentFactory, "Creëert", "Method Call")
-     Rel(paymentFactory, stripeAdapter, "Creëert indien nodig", "Instantiation")
-     Rel(paymentFactory, paypalAdapter, "Creëert indien nodig", "Instantiation")
+  Rel(betalingService, paymentFactory, "Creëert", "Method Call")
+  Rel(paymentFactory, stripeAdapter, "Creëert indien nodig", "Instantiation")
+  Rel(paymentFactory, paypalAdapter, "Creëert indien nodig", "Instantiation")
 
-     Rel(betalingService, tripService, "Haalt prijsgegevens op", "Method Call")
-      Rel(betalingService, userService, "Haalt klantgegevens op", "Method Call")
+  Rel(betalingService, betalingRepository, "Leest/schrijft", "JDBC")
 
-      Rel(tripService, tripRepository, "Leest/schrijft", "JDBC")
-      Rel(userService, gebruikerRepository, "Leest/schrijft", "JDBC")
-      Rel(betalingService, betalingRepository, "Leest/schrijft", "JDBC")
+  Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
+  Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
+  Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
 
-    Rel(loginController, loginService, "Stuurt inlogverzoeken", "JSON/HTTP")
-    Rel(loginService, userRepository, "Leest/schrijft gebruikersdata", "JDBC/SQL")
-    Rel(loginService, loginPort, "Stuurt authenticatieverzoeken", "REST/JSON")
-
-    Rel(loginPort, wireMockAdapterV1, "Implementeert (v1)", "REST/JSON")
-    Rel(loginPort, wireMockAdapterV2, "Implementeert (v2)", "REST/JSON")
+  Rel(loginPort, wireMockAdapterV1, "Implementeert (v1)", "REST/JSON")
+  Rel(loginPort, wireMockAdapterV2, "Implementeert (v2)", "REST/JSON")
 
 }
 
@@ -99,8 +90,6 @@ Rel(paymentRepository,database,"Leest/ Schrijft naar")
 Rel(paymentService, paymentAdapter, "Verwerkt betalingen", "REST/JSON")
 Rel(paymentService,paymentRepository, "Leest/schrijft betalingsdata")
 Rel(paymentAdapter, payment_provider, "Verwerkt betalingen", "REST/JSON")
-Rel(tripRepository, database, "Leest/Schrijft naar", "")
 Rel(userRepository, database, "Voert CRUD-operaties uit", "")
 Rel(betalingRepository, database, "Leest/Schrijft naar", "")
-Rel(gebruikerRepository, database, "LeestSchrijf naar")
 @enduml
