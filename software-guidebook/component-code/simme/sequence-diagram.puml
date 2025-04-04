@@ -7,6 +7,7 @@ participant BetalingFactory
 participant BetalingAdapter
 participant BetalingRepository
 participant PaymentProvider
+
 ' Payment creation flow
 User -> BetalingController: POST /betaling/add (BetalingsVerzoek)
 BetalingController -> BetalingService: verwerkBetaling(betaling)
@@ -19,12 +20,15 @@ BetalingAdapter --> BetalingService: Betaling entity
 BetalingService -> BetalingRepository: save(betalingResultaat)
 BetalingService --> BetalingController: BetalingsResultaat
 BetalingController --> User: BetalingsResultaat with redirectUrl
+
 ' User is redirected to payment provider
 User -> PaymentProvider: Complete payment on provider site
 PaymentProvider -> User: Redirect back to application
+
 ' Success/cancel handling
 User -> BetalingController: GET /betaling/success or /cancel
 BetalingController --> User: Redirect to status page or home
+
 ' Status check flow
 User -> BetalingController: GET /betaling/status?betalingId=xxx
 BetalingController -> BetalingService: haalBetalingOp(betalingId)
