@@ -1,0 +1,32 @@
+@startuml
+actor "Gebruiker" as Gebruiker
+participant "AuthController" as Controller
+participant "AuthService" as Service
+participant "AuthAdapter" as Adapter
+participant "Wiremock API" as ExternalAPI
+participant "User:\n user" as User
+database "UserRepository" as Repo
+
+Gebruiker -> Controller: POST /auth/login\n(AuthLoginRequest: username, password)
+Controller -> Service: login(loginRequest)
+Service -> Adapter: login(username, password)
+Adapter -> ExternalAPI: POST /login\n{username, password}
+ExternalAPI --> Adapter: token (via header/JSON)
+Adapter --> Service:  token
+Service -> Repo: user = findByUsername(username)
+Service ->User: setToken(token)
+Service -> Repo: save(user + token)
+Service --> Controller: LoginResponse(token)
+Controller --> Gebruiker: HTTP 200\n{token}
+
+Gebruiker -> Controller: POST /auth/check\n(CheckRequest: username, application, token)
+Controller -> Service: check(token, checkRequest)
+Service -> Adapter: check(token, username, application)
+Adapter -> ExternalAPI: POST /checkAppAccess\n(token in header & JSON body)
+ExternalAPI --> Adapter: XML response\n(voorbeeld: <response><access>allowed</access><role>klant</role></response>)
+Adapter --> Service: return CheckResponse(access, role)
+Service --> Controller: CheckResponse(access, role)
+Controller --> Gebruiker: HTTP 200\n{access, role}
+
+
+@enduml

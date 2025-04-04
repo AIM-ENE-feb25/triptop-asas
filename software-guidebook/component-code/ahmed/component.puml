@@ -7,7 +7,7 @@ Container(frontend, "Frontend", "React, JavaScript", "Stelt gebruikers in staat 
 System_Boundary(backendSystem, "Backend", "Java, Spring Boot", "Beheert de businesslogica van TripTop") {
     Component(loginController, "Login Controller", "Spring MVC", "Verwerkt inlogverzoeken")
     Component(loginService, "Login Service", "Spring Service", "Behandelt authenticatie en inloglogica")
-    Component(loginPort, "Login Port", "Interface", "Definieert een stabiel contract voor externe authenticatie")
+    Component(loginPort, "AuthAdapter", "Interface", "Definieert een stabiel contract voor externe authenticatie")
     Component(userRepository, "User Repository", "Spring Data JPA", "Beheert opslag van gebruikersgegevens")
 
     Component(wireMockAdapterV1, "WireMock Adapter v1", "Adapter Pattern", "Implementeert Login Port voor de WireMock API (v1)")

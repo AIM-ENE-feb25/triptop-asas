@@ -1,53 +1,80 @@
 @startuml
-skinparam rankdir TB
-title Login Component Class Diagram
+skinparam classAttributeIconSize 0
+skinparam shadowing false
 
-class LoginController <<Controller>> {
-    - LoginService loginService
-    --
-    + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
+package "TripTop Applicatie" {
+
+    class AuthController {
+        +login(loginRequest: AuthLoginRequest): AuthLoginResponse
+        +check(token: String, checkRequest: AuthCheckRequest): AuthCheckResponse
+    }
+
+    class AuthService {
+        +login(loginRequest: AuthLoginRequest): AuthLoginResponse
+        +check(token: String, checkRequest: AuthCheckRequest): AuthCheckResponse
+    }
+
+    interface AuthAdapter {
+        +login(username: String, password: String): String
+        +check(token: String, username: String, application: String): AuthCheckResponse
+    }
+
+    class WireMockAuthAdapterV1 {
+        +login(username: String, password: String): String
+        +check(token: String, username: String, application: String): AuthCheckResponse
+    }
+    class WireMockAuthAdapterV2 {
+        +login(username: String, password: String): String
+        +check(token: String, username: String, application: String): AuthCheckResponse
+    }
+
+    class UserRepository {
+        +findByUsername(username: String): Optional<User>
+        +save(user: User)
+    }
+
+    class User {
+        -id: Long
+        -username: String
+        -token: String
+    }
+
+    package "DTO's" {
+        class AuthLoginRequest {
+            -username: String
+            -password: String
+        }
+        class AuthLoginResponse {
+            -token: String
+        }
+        class AuthCheckRequest {
+            -username: String
+            -application: String
+        }
+        class AuthCheckResponse {
+            -access: String
+            -role: String
+        }
+    }
+
+    AuthController --> AuthService : "Maakt gebruik van"
+    AuthService --> UserRepository : "Haalt/slaat gebruiker op (JPA)"
+    AuthService --> AuthAdapter : "Verifieert gebruiker via"
+    AuthAdapter <|-- WireMockAuthAdapterV1 : "Implementeert"
+    AuthAdapter <|-- WireMockAuthAdapterV2 : "Implementeert"
+
+    AuthController --> AuthLoginRequest : "Ontvangt (JSON)"
+    AuthController --> AuthLoginResponse : "Geeft terug (JSON)"
+    AuthController --> AuthCheckRequest : "Ontvangt (JSON)"
+    AuthController --> AuthCheckResponse : "Geeft terug (JSON)"
+
+    UserRepository --> User : "Beheert (JPA)"
+
+    note right of WireMockAuthAdapterV2::check
+    "Deze functie verwerkt de XML response\n
+     en transformeert deze naar een AuthCheckResponse\n
+     (Adapter Pattern: XML naar DTO conversie)"
+    end note
 }
-
-class LoginService <<Service>> {
-    + AuthToken authenticate(Reiziger reiziger) throws AuthenticationException
-    + handleFallbackScenario() ' optioneel
-    - LoginPort loginPort
-    - LoginRepo loginRepo
-}
-
-class AuthenticationException <<Exception>>
-
-interface LoginPort <<Port>> {
-    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
-}
-
-class WireMockAdapterV1 <<Adapter>> {
-    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
-}
-
-class WireMockAdapterV2 <<Adapter>> {
-    + AuthToken authenticateExternal(Reiziger reiziger) throws AuthenticationException
-}
-
-interface LoginRepo <<Port>> {
-    + Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
-}
-
-class LoginRepoImpl <<Repository>> {
-    + Reiziger authenticate(Reiziger reiziger) throws AuthenticationException
-}
-
-class Reiziger <<Entity>> {
-    - String username
-    - String password
-}
-
-LoginController --> LoginService : uses
-LoginService --> AuthenticationException : «throws»
-LoginService --> LoginPort : uses
-LoginPort <|.. WireMockAdapterV1 : «implements»
-LoginPort <|.. WireMockAdapterV2 : «implements»
-LoginService --> LoginRepo : uses
-LoginRepo <|.. LoginRepoImpl : «implements»
 
 @enduml
