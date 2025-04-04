@@ -1,0 +1,41 @@
+# Java build directories
+/build/
+/out/
+/bin/
+
+# Gradle directories
+/.gradle/
+/build/
+
+# IntelliJ IDEA project files
+/.idea/
+/*.iws
+/*.iml
+/*.ipr
+
+# VS Code directory
+/.vscode/
+
+# Eclipse project files
+/.classpath
+/.project
+/.settings/
+/.apt_generated
+/.factorypath
+/.springBeans
+/.sts4-cache
+
+# NetBeans directories
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Log files
+*.log
+venv
+
+# OS-specific files
+.DS_Store
+Thumbs.db

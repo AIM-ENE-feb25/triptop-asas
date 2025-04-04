@@ -1,0 +1,20 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/login",
+        "bodyPatterns": [
+            {
+                "matchesJsonPath": "$[?(@.username == 'nkok' && @.password == '8bN6jK4o7l')]"
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "token": "{{randomValue length=16 type='ALPHANUMERIC'}}"
+        },
+        "transformers": [
+            "response-template"
+        ]
+    }
+}

@@ -85,11 +85,127 @@ Voordat deze casusomschrijving tot stand kwam, heeft de opdrachtgever de volgend
 > [!IMPORTANT]
 > Beschrijf zelf de beperkingen die op voorhand bekend zijn die invloed hebben op keuzes die wel of niet gemaakt kunnen of mogen worden.
 
-## 6. Principles
+## 6. Ontwerpvragen
 
-> [!IMPORTANT]
-> Beschrijf zelf de belangrijkste architecturele en design principes die zijn toegepast in de software.
+### 6.1 Hoe zorg je dat een wijziging in een of meerdere APIs niet leidt tot een grote wijziging in de applicatie? Specifieker: hoe zorg je ervoor dat een wijziging in de API van een externe service niet leidt tot een wijziging in de front-end maar flexibel kan worden opgevangen door de back-end?
+### Context
 
+De TripTop applicatie gebruikt een centrale authenticatieprovider die gebaseerd is op de WireMock API. Gebruikers loggen in via deze externe service, en de applicatie haalt daarvoor een token op en controleert de toegangsrechten via een "check" endpoint.
+
+#### Oude API
+
+- **Login Endpoint (Oude API):**  
+  De oude WireMock API voor login accepteerde een JSON-bericht waarin de gebruikersnaam en het wachtwoord werden meegegeven.  
+  **Response:**
+  - Het token werd teruggegeven in de JSON body.
+  - Voorbeeld response:
+    ```json
+    {
+      "token": "abc123def456"  
+    }
+    ```
+- **Check Endpoint (Oude API):**  
+  De check endpoint werd aangeroepen met het token als query parameter en de overige gegevens (gebruikersnaam en application) in de JSON body.  
+  **Response:**
+  - De response was een JSON object met bijvoorbeeld:
+    ```json
+    {
+      "access": "allowed",
+      "role": "klant"
+    }
+    ```
+
+#### Nieuwe API
+
+- **Login Endpoint (Nieuwe API):**  
+  In de nieuwe WireMock versie is er een wijziging doorgevoerd:
+  - Het login endpoint geeft nu een token terug in de response-header in plaats van in de JSON body.
+
+- **Check Endpoint (Nieuwe API):**  
+  Ook het check endpoint is gewijzigd:
+  - Het token wordt nu meegegeven in de HTTP header (bijvoorbeeld in de `Authorization` header) in plaats van als query parameter.
+  - Bovendien wordt de response in XML teruggegeven in plaats van JSON.
+  - Voorbeeld response:
+    ```xml
+    <response>
+      <access>allowed</access>
+      <role>klant</role>
+    </response>
+    ```
+
+### Design Patterns en Design Principles
+
+
+1. **Adapter Pattern:**
+- We hebben een uniforme interface (bijvoorbeeld `AuthAdapter`) gedefinieerd die twee concrete implementaties heeft:
+  - **WireMockAuthAdapterV1:** voor de oude API.
+  - **WireMockAuthAdapterV2:** voor de nieuwe API.
+- Beide adapters bieden dezelfde methodes (bijv. `login()` en `check()`) en retourneren altijd een uniform DTO (bijvoorbeeld `LoginResponse` en `CheckResponse`).
+- Hierdoor hoeft de controller (en dus de front-end) niets te weten van de verschillen tussen de oude en nieuwe API. Alleen de back-end adapter past zich aan op basis van de configuratie of op basis van de tokenlengte (bijvoorbeeld: bestaande gebruikers blijven via V1, nieuwe gebruikers via V2).
+
+2. **Single Responsibility Principle (SRP):**
+- Elke klasse heeft één verantwoordelijkheid. Zo beheert de adapter de communicatie met de externe API en vertaalt deze response naar de interne DTO's.
+- De service laag beheert de businesslogica en de gebruikerssessies, terwijl de controller zich alleen richt op het ontvangen en retourneren van HTTP-verzoeken.
+
+3. **Open/Closed Principle (OCP):**
+- De back-end is zo opgezet dat deze openstaat voor uitbreiding (bijvoorbeeld voor een derde versie van de API) zonder dat bestaande code aangepast hoeft te worden. Nieuwe adapters kunnen eenvoudig toegevoegd worden.
+
+4. **Dependency Inversion Principle (DIP):**
+- De controller en service laag werken tegen de abstracte interface (`AuthAdapter`) in plaats van tegen concrete implementaties. Hierdoor kunnen we de concrete implementatie (V1 of V2) eenvoudig wisselen zonder dat de hogere lagen (controller, service) gewijzigd hoeven te worden.
+
+#### Component Diagram
+![Component Diagram](component-code/ahmed/component-Component_Diagram___TripTop_Backend.png)
+
+#### Toelichting Component Diagram
+
+- **Frontend:**  
+  De gebruikersinterface die de gebruiker in staat stelt om reizen te plannen en te beheren.
+
+- **Backend (Java, Spring Boot):**  
+  De backend bestaat uit verschillende lagen:
+  - **Login Controller:** Ontvangt inlogverzoeken van de frontend.
+  - **Login Service:** Behandelt de authenticatielogica en maakt gebruik van een uniforme interface voor externe authenticatie (AuthAdapter).
+  - **AuthAdapter:** Dit is de abstractie die door twee concrete adapters wordt geïmplementeerd, namelijk de WireMock Adapter v1 en v2.
+  - **User Repository:** Slaat gebruikersgegevens op in de database.
+
+- **Externe Systemen:**  
+  Twee WireMock API’s simuleren de externe identiteitprovider:
+  - Eén voor de oude API (v1) en één voor de nieuwe API (v2).
+
+- **Database:**  
+  Een MSSQL-database die gebruikers informatie beheert.
+
+---
+
+#### Code Diagram – TripTop Applicatie
+
+
+![Code Diagram](component-code/ahmed/login-Login_Component_Class_Diagram.png)
+#### Toelichting Code Diagram
+
+- **AuthController:**  
+  De controller ontvangt HTTP-verzoeken (login en check) en roept de AuthService aan om de businesslogica uit te voeren. Hij ontvangt en retourneert DTO's (AuthLoginRequest/Response en AuthCheckRequest/Response).
+
+- **AuthService:**  
+  Deze service beheert de authenticatielogica en de gebruikersgegevens via de UserRepository en maakt gebruik van de AuthAdapter (interface) voor externe authenticatie.
+
+- **AuthAdapter:**  
+  Een interface die de contracten definieert voor de externe authenticatie. Er zijn twee concrete implementaties:
+  - **WireMockAuthAdapterV1:** Werkt met de oude API (JSON response; token via URL).
+  - **WireMockAuthAdapterV2:** Werkt met de nieuwe API (XML response; token via header).  
+    De note geeft aan dat in deze adapter de XML response wordt geconverteerd naar een AuthCheckResponse DTO (Adapter Pattern).
+
+- **UserRepository en User:**  
+  Beheren de gebruikersgegevens in de database via JPA.
+
+- **DTO's:**  
+  De Data Transfer Objects zorgen voor een uniforme manier van gegevensuitwisseling tussen de lagen. Ze omvatten:
+  - **AuthLoginRequest:** Bevat gebruikersnaam en wachtwoord.
+  - **AuthLoginResponse:** Bevat het token na een succesvolle login.
+  - **AuthCheckRequest:** Bevat gebruikersnaam en de application voor de check.
+  - **AuthCheckResponse:** Bevat de toegangsstatus (access) en de rol (role) na het uitvoeren van de check.
+
+---
 ## 7. Software Architecture
 
 ###     7.1. Containers
@@ -107,7 +223,7 @@ De container diagram toont in meer detail hoe Triptop integreert met de verschil
 We hebben besloten om ReisAgent niet een person te maken in ons context diagram. Dit is omdat er geen user story voor de reisagent is en dus geen functionaliteit heeft binnen de applicatie.
 
 
-### 2.2 Dynamische Container Diagram
+### 7.2 Dynamische Container Diagram
 ### 7.2.1  Inloggen
 
 ![Inloggen](dynamisch-container-diagrammen/inlog-dynamisch-diagram.png)
@@ -160,16 +276,9 @@ Indien de betaling mislukt, zal de gebruiker de boeking opnieuw moeten maken, om
 
 
 
-###     7.2. Components
 
-[Ahmed Component & Code](component-code/ahmed/ReadMe.MD)
-> [!IMPORTANT]
-> Voeg toe: Component Diagram plus een Dynamic Diagram van een aantal scenario's inclusief begeleidende tekst.
 
-###     7.3. Design & Code
 
-> [!IMPORTANT]
-> Voeg toe: Per ontwerpvraag een Class Diagram plus een Sequence Diagram van een aantal scenario's inclusief begeleidende tekst.
 
 ## 8. Architectural Decision Records
 
@@ -504,6 +613,7 @@ Gevolgen
 
 
 ---
+
 
 ## 10. API Mapping
 

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/checkAppAccess",
+    "headers": {
+      "Authorization": {
+        "matches": "^Bearer\\s+.*"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "$.username",
+          "matches": "^(edevries|dvandijk|sbakker)$"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "$.application",
+          "equalTo": "triptop"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/xml"
+    },
+    "body": "<response><access>allowed</access><role>klant</role></response>"
+  }
+}

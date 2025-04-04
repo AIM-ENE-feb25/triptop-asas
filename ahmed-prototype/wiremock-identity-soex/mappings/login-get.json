@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/login"
+  },
+  "response": {
+    "status": 200,
+    "body": "This is a mock response for a GET request to /login",
+    "headers": {
+      "Content-Type": "text/plain"
+    }
+  }
+}
+

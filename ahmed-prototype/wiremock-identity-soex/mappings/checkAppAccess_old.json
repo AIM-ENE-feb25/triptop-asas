@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/checkAppAccess",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$[?(@.username == 'edevries' && @.application == 'triptop')]"
+      },
+      {
+        "matchesJsonPath": "$[?(@.username == 'dvandijk' && @.application == 'triptop')]"
+      },
+      {
+        "matchesJsonPath": "$[?(@.username == 'sbakker' && @.application == 'triptop')]"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "access": "allowed",
+      "role": "klant"
+    }
+  }
+}
