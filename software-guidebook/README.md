@@ -268,20 +268,34 @@ Hierboven zie je mijn sequence diagram. Dit diagram laat zien hoe de verschillen
 
 Hoe kunnen we verschillende betalingssystemen integreren voor de verschillende bouwstenen?
 
+1. Adapter Pattern
+
+De BetalingAdapter interface creëert een gestandaardiseerde manier om met verschillende betalingssystemen te communiceren
+
+Specifieke implementaties (StripeAdapter en PayPalAdapter) bevatten de leverancier-specifieke code
+
+Dit patroon zorgt ervoor dat de betalingslogica niet afhankelijk is van specifieke externe systemen
+
+2. Factory Pattern
+
+De BetalingFactory klasse centraliseert het creëren van de juiste adapter gebaseerd op de betalingsmethode
+
+Dit elimineert voorwaardelijke logica (if-else/switch) in de betalingsservice
+
+Nieuwe betalingsmethoden kunnen worden toegevoegd zonder de kerncode aan te passen
+
 ### Component Diagram
 ![Component Diagram](component-code/simme/component-diagram.png)
 
-Dit diagram toont de structurele organisatie en afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
+Dit diagram toont de afhankelijkheden tussen de verschillende modules in het systeem. Het diagram laat zien:
 
 - Een duidelijke scheiding tussen frontend en backend-componenten, met een API-grens via de BetalingController
-- Hoe de BetalingService als orchestrator fungeert voor het betalingsproces
+- Hoe de BetalingService als fungeert voor het betalingsproces
 - De interne opdeling in gespecialiseerde adapters voor elke betalingsprovider
 - De BetalingFactory als centraal punt voor het selecteren van de juiste adapter
 - De connectie met externe betalingssystemen via gestandaardiseerde interfaces
 
 Deze componentarchitectuur vormt een "payment hub"-benadering, waarbij een gespecialiseerde laag tussen de kernbusiness-logica en externe betalingsproviders wordt geplaatst. Dit patroon biedt flexibiliteit voor het uitbreiden met nieuwe betalingsmethoden en isoleert de impact van wijzigingen in externe systemen.
-
-De gekozen architectuur implementeert de aanbevolen praktijken voor betalingssysteemintegratie, waaronder directe API-integratie met adaptermechanismen voor het beheren van meerdere betalingsgateways.
 
 ### Dynamic Component Diagram
 
@@ -299,9 +313,10 @@ Deze architectuur biedt een robuuste manier om meerdere betalingsproviders te on
 ### Sequence Diagram
 
 ![Sequence](component-code/simme/sequence-diagram.png)
+
 Het sequence diagram detailleert de exacte interacties tussen systeemcomponenten tijdens het betalingsproces. Het diagram:
 
-- Illustreert de volledige transactionele flow van betalingscreatie tot statusverificatie
+- Illustreert de volledige flow van betalingscreatie tot statusverificatie
 - Toont hoe de betalingscontroller verzoeken coördineert en doorstuurt naar de juiste services
 - Demonstreert de factory-methode voor het dynamisch genereren van de juiste betalingsadapter
 - Laat zien hoe gebruikerstransacties worden afgehandeld, inclusief doorverwijzing naar externe betalingsproviders en terugkeer naar het platform
