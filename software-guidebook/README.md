@@ -678,53 +678,60 @@ Het is mogelijk dat de facade class te groot wordt en dat het moeilijk wordt om 
 
 
 
+Hieronder vind je de nieuwe ADR voor de implementatie van het Adapter Pattern in de TripTop applicatie:
 
-
+---
 
 ### ADR-007: Gebruik van het Adapter Pattern voor Inloggen
-#### **Status:** Geaccepteerd
 
-#### **Context**  
-Onze applicatie integreert externe authenticatieproviders, zoals de WireMock API. Er is een noodzaak om te voorkomen dat wijzigingen in de externe API – bijvoorbeeld wijzigingen in endpoints of responstructuren – leiden tot ingrijpende aanpassingen in de applicatie, met name in de front-end. We willen dat de back-end flexibel is en externe veranderingen opvangt via een stabiel intern contract. Hierdoor kan de front-end ongewijzigd blijven, ongeacht wijzigingen in de externe services.
+#### **Status:**
+Geaccepteerd
 
-#### Overwogen opties (Beslissingsfactoren)
+#### **Context**
+Onze applicatie integreert externe authenticatieproviders, zoals de WireMock API. We hebben te maken met wijzigingen in de externe API, bijvoorbeeld in endpoints en responstructuren, die grote aanpassingen in de applicatie zouden kunnen vereisen. Daarbij willen we dat de front-end ongewijzigd blijft, terwijl de back-end flexibel genoeg is om externe wijzigingen op te vangen via een stabiel intern contract. Daarnaast is er in de nieuwe API-versie een verschil ontstaan:
+- **Oude API (v1):**
+  - **Login:** Gebruikers sturen inloggegevens als JSON, en de WireMock API retourneert een token in de JSON body .
+  - **Check:** Het token wordt als queryparameter meegegeven, en de response is een JSON object met de velden `access` en `role`.
+- **Nieuwe API (v2):**
+  - **Login:** Gebruikers sturen inloggegevens als JSON, maar het token wordt nu in de response header teruggegeven.
+  - **Check:** Het token wordt via een HTTP header meegegeven (bijvoorbeeld in de `Authorization` header), en de response wordt als XML geretourneerd.
 
-| Criteria                                        | Belang  | State Pattern | Strategy Pattern | Adapter Pattern | Facade Pattern | Factory Method Pattern |
-|-------------------------------------------------|---------|---------------|------------------|-----------------|----------------|------------------------|
-| Losse koppeling tussen intern en extern         | Hoog    | --            | -                | ++             | +              | -                      |
-| Flexibiliteit bij API-wijzigingen               | Hoog    | --            | -                | ++             | +              | --                     |
-| Eenvoud van uitbreiding                         | Matig   | -             | +                | ++             | +              | +                      |
-| Gericht op interfacevertaling                   | Hoog    | --            | --               | ++             | -              | --                     |
-| Complexiteit en onderhoudbaarheid               | Matig   | -             | +                | ++             | +              | -                      |
+#### **Overwogen opties (Beslissingsfactoren)**
 
-- **State Pattern:**  
-  -- Niet geschikt, omdat dit patroon bedoeld is om gedrag op basis van interne status te beheren, niet om externe API-contracten te vertalen.
+| Criteria                                        | Belang  | State Pattern | Strategy Pattern | **Adapter Pattern** | Facade Pattern | Factory Method Pattern |
+|-------------------------------------------------|---------|---------------|------------------|---------------------|----------------|------------------------|
+| Losse koppeling tussen intern en extern         | Hoog    | --            | -                | **++**             | +              | -                      |
+| Flexibiliteit bij API-wijzigingen               | Hoog    | --            | -                | **++**             | +              | --                     |
+| Eenvoud van uitbreiding                         | Matig   | -             | +                | **++**             | +              | +                      |
+| Gericht op interfacevertaling                   | Hoog    | --            | --               | **++**             | -              | --                     |
+| Complexiteit en onderhoudbaarheid               | Matig   | -             | +                | **++**             | +              | -                      |
 
-- **Strategy Pattern:**
-    - Kan verschillende algoritmen encapsuleren, maar biedt onvoldoende isolatie voor externe API-aanpassingen.
+- **State Pattern:** Niet geschikt, omdat dit patroon bedoeld is voor gedragsveranderingen gebaseerd op interne status en niet voor het vertalen van externe API-contracten.
+- **Strategy Pattern:** Hoewel dit verschillende algoritmen kan encapsuleren, biedt het onvoldoende isolatie voor wijzigingen in externe API’s.
+- **Adapter Pattern:** **++** Dit patroon creëert een tussenlaag die het interne contract (de Login Port) vertaalt naar externe API-aanroepen. Hierdoor blijft de interne businesslogica stabiel en kunnen externe wijzigingen op een flexibele manier worden opgevangen.
+- **Facade Pattern:** Biedt een vereenvoudigde interface voor complexe subsystemen, maar richt zich minder op de vertaling van externe API-verschillen.
+- **Factory Method Pattern:** Richt zich op objectcreatie en verbergt de creatie van objecten, maar lost niet direct het probleem op van een stabiel contract met externe API’s.
 
-- **Adapter Pattern:**  
-  ++ Dit patroon creëert een tussenlaag die het interne contract (Login Port) vertaalt naar externe API-aanroepen. Hierdoor blijft de interne logica stabiel en is de applicatie makkelijk uitbreidbaar.
+#### **Beslissing**
+Wij kiezen voor het **Adapter Pattern**. Dit patroon stelt ons in staat om een stabiel intern contract te definiëren via de Login Port (AuthAdapter). Concrete adapter-implementaties – bijvoorbeeld **WireMockAuthAdapterV1** en **WireMockAuthAdapterV2** – vertalen de interne method calls naar externe API-aanroepen. Op deze wijze blijft de businesslogica in de applicatie onveranderd, ongeacht veranderingen in de externe authenticatieprovider.
 
-- **Facade Pattern:**
-    + Biedt een vereenvoudigde interface voor complexe subsystemen, maar is minder gericht op het vertalen van externe API-verschillen.
-
-- **Factory Method Pattern:**
-    - Richt zich op objectcreatie en verbergt de creatie van objecten, maar lost niet direct het probleem op van een stabiel contract met externe API’s.
-
-#### **Beslissing**  
-Wij kiezen voor het **Adapter Pattern**. Dit patroon stelt ons in staat om een stabiel intern contract te definiëren via de Login Port, waarna de concrete adapters (bijvoorbeeld WireMock Adapter v1 en v2) de vertaling verzorgen naar de externe API-aanroepen. Hierdoor blijft de businesslogica van de applicatie onveranderd, zelfs als de externe API wijzigt. De keuze voor het Adapter Pattern ondersteunt het Open/Closed Principe: we kunnen nieuwe adapter-implementaties toevoegen (bijvoorbeeld voor een nieuwe API-versie) zonder bestaande code te wijzigen. Bovendien volgt deze keuze het Single Responsibility Principe, omdat elke component precies één taak heeft.
+De keuze voor het Adapter Pattern ondersteunt tevens het **Open/Closed Principe**: nieuwe adapter-implementaties kunnen eenvoudig worden toegevoegd (bijvoorbeeld voor toekomstige API-versies) zonder bestaande code aan te passen. Tevens volgt de implementatie het **Single Responsibility Principe**: elke component (de adapters, service, controller) heeft een afgebakende verantwoordelijkheid.
 
 #### **Consequenties**
-- **Voordelen:**  
-  ++ Losse koppeling tussen de interne logica en de externe API’s.  
-  ++ Flexibiliteit om meerdere versies van een externe API te ondersteunen (bijvoorbeeld WireMock v1 en v2).  
-  ++ Eenvoudige uitbreiding en onderhoud; nieuwe adapters kunnen worden toegevoegd zonder ingrijpende aanpassingen in de Login Service of de front-end.  
-  ++ Stabiliteit voor de front-end, omdat deze enkel communiceert via het vastgelegde contract (Login Port).
 
-- **Risico's en Nadelen:**
-    - Extra complexiteit in de back-end door de introductie van meerdere adapter-implementaties.
-    - Mogelijke duplicatie van functionaliteit indien adapters overlappende taken hebben, wat nauwgezet beheer vereist.
+- **Voordelen:**
+  - De interne logica is losgekoppeld van de externe API’s. Wijzigingen in de externe systemen vereisen alleen aanpassingen in de adapters.
+  - Nieuwe API-versies kunnen door middel van extra adapter-implementaties worden toegevoegd zonder ingrijpende wijzigingen in de Login Service of de front-end.
+  - De front-end blijft communiceren via het vastgelegde contract (de AuthAdapter en bijbehorende DTO's), waardoor wijzigingen in de externe API transparant blijven.
+
+- **Nadelen:**
+  - De back-end bevat nu meerdere adapter-implementaties, wat extra beheer vereist.
+  - Het onderhouden van meerdere implementaties kan leiden tot duplicatie of overlapping, waardoor extra aandacht nodig is voor consistente functionaliteit.
+
+---
+
+
+
 
 ### ADR-008: Keuze van Design Pattern - Amine
 
