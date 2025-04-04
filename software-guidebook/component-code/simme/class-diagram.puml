@@ -1,47 +1,59 @@
+
 @startuml
 title Class Diagram – TripTop Betalingsintegratie
 
 interface BetalingAdapter {
-    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +BetalingsStatus controleerStatus(String betalingId)
+    +Betaling verwerkBetaling(BetalingsVerzoek verzoek)
+    +DetailedBetalingStatus controleerStatus(String betalingId)
 }
 
 class StripeAdapter {
-    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +BetalingsStatus controleerStatus(String betalingId)
+    +Betaling verwerkBetaling(BetalingsVerzoek verzoek)
+    +DetailedBetalingStatus controleerStatus(String betalingId)
 }
 
-class PayPalAdapter {
-    +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +BetalingsStatus controleerStatus(String betalingId)
+class PaypalAdapter {
+    +Betaling verwerkBetaling(BetalingsVerzoek verzoek)
+    +DetailedBetalingStatus controleerStatus(String betalingId)
 }
 
 class BetalingFactory {
-    +BetalingAdapter createAdapter(BetalingsMethode methode)
+    +BetalingAdapter createBetalingAdapter(BetalingsMethode methode)
 }
 
 interface BetalingService {
     +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +Betaling haalBetalingOp(String betalingId)
+    +DetailedBetalingStatus haalBetalingOp(String betalingId)
 }
 
 class BetalingServiceImpl {
     -BetalingRepository repository
     -BetalingFactory factory
     +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +Betaling haalBetalingOp(String betalingId)
+    +DetailedBetalingStatus haalBetalingOp(String betalingId)
 }
 
 class BetalingController {
     -BetalingService service
     +BetalingsResultaat verwerkBetaling(BetalingsVerzoek verzoek)
-    +Betaling haalBetalingOp(String betalingId)
+    +DetailedBetalingStatus controleerStatus(String betalingId)
+}
+
+interface BetalingRepository {
 }
 
 class BetalingsVerzoek {
     -String reserveringId
-    -BigDecimal bedrag
+    -double bedrag
     -BetalingsMethode methode
+}
+
+class DetailedBetalingStatus {
+    -String betalingId
+    -BetalingsStatus status
+    -double bedrag
+    -BetalingsMethode methode
+    -LocalDateTime tijdstempel
 }
 
 class BetalingsResultaat {
@@ -53,7 +65,8 @@ class BetalingsResultaat {
 class Betaling {
     -String betalingId
     -String reserveringId
-    -BigDecimal bedrag
+    -String redirectUrl
+    -double bedrag
     -BetalingsStatus status
     -BetalingsMethode methode
     -LocalDateTime tijdstempel
@@ -66,20 +79,20 @@ enum BetalingsMethode {
 
 enum BetalingsStatus {
     GESTART
+    VERWERKING
+    PENDING
     VOLTOOID
+    GEANNULEERD
     MISLUKT
-}
-
-class BetalingsException {
 }
 
 BetalingController --> BetalingService: "gebruikt"
 BetalingServiceImpl ..|> BetalingService: "implementeert"
 BetalingServiceImpl --> BetalingFactory: "gebruikt"
+BetalingServiceImpl --> BetalingRepository: "gebruikt"
 BetalingFactory --> BetalingAdapter: "creëert"
 StripeAdapter ..|> BetalingAdapter: "implementeert"
-PayPalAdapter ..|> BetalingAdapter: "implementeert"
-BetalingServiceImpl --> BetalingsException: "gooit"
+PaypalAdapter ..|> BetalingAdapter: "implementeert"
 BetalingServiceImpl --> BetalingsVerzoek: "verwerkt"
 BetalingServiceImpl --> BetalingsResultaat: "retourneert"
 BetalingServiceImpl --> Betaling: "beheert"
@@ -87,5 +100,7 @@ BetalingsVerzoek --> BetalingsMethode: "gebruikt"
 BetalingsResultaat --> BetalingsStatus: "bevat"
 Betaling --> BetalingsMethode: "bevat"
 Betaling --> BetalingsStatus: "bevat"
+DetailedBetalingStatus --> BetalingsStatus: "bevat"
+DetailedBetalingStatus --> BetalingsMethode: "bevat"
 
 @enduml
